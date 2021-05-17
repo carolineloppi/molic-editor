@@ -1,12 +1,7 @@
-
-/* header{
-    height: 40px;
-} */
 .nav {
     display: flex;
     height: 50px;      /* optional; just for demo */
     background-color: rgba(128, 128, 128, 0.246);
-
   }
 
 .buttons-group {
@@ -19,10 +14,9 @@
 .button-area{
     margin-right: 20px;
     margin-bottom: -10px;
-
 }
 
-.button-label{
+.action-button-label{
     padding-left: 12px;
     display: inline-flexbox;
     font-size: 12px;
@@ -55,8 +49,7 @@
     text-decoration: none;
 }
 
-.button-area:hover, .screenshot-button:hover{
-    background-color: tomato;
+.action-button-label:hover, .action-button:hover, .screenshot-button:hover{
     cursor: pointer;
 }
 
