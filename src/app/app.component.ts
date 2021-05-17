@@ -8,19 +8,19 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'molic-editor';
 
-  public createNewDiagram(){
+  public createNewDiagram(): void {
     console.log('Creates new Diagram!');
   }
 
-  public exportCurrentDiagram(){
+  public exportCurrentDiagram(): void {
     console.log('Exports current Diagram!');
   }
-  
-  public importNewDiagram(){
+
+  public importNewDiagram(): void {
     console.log('Imports a new Diagram!');
   }
 
-  public takeScreenshot(){
+  public takeScreenshot(): void {
     console.log('Takes a screenshot of the Diagram');
   }
 }
