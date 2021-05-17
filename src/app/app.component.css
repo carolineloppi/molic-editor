@@ -1,3 +1,5 @@
+
+/* ------------- Start of Toolbar Styles -------------- */
 .nav {
     display: flex;
     height: 50px;      /* optional; just for demo */
@@ -24,7 +26,6 @@
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
 }
-
 
 .header-title {
     flex: 1;
@@ -57,9 +58,17 @@
     margin-right: 10px;
 }
 
+/* ------------- End of Toolbar Styles -------------- */
+
+
+/* ------------- Start of Shared Components Styles -------------- */
+
 button, img{
     height: 25px;
     width: 25px;
     border: none;
     background-color: transparent;
 }
+
+/* ------------- End of Shared Components Styles -------------- */
+
