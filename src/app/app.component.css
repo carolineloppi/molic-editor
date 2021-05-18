@@ -1,9 +1,14 @@
 
 /* ------------- Start of Toolbar Styles -------------- */
+header{
+    height: 60px;
+    background-color: rgba(128, 128, 128, 0.246);
+    border-bottom: 2px solid rgb(175, 175, 175);
+}
+
 .nav {
     display: flex;
-    height: 50px;      /* optional; just for demo */
-    background-color: rgba(128, 128, 128, 0.246);
+    height: 50px;
   }
 
 .buttons-group {
@@ -28,6 +33,7 @@
 }
 
 .header-title {
+    margin-top: 5px;
     flex: 1;
     display: flex;
     justify-content: center;
@@ -63,6 +69,14 @@
 
 /* ------------- Start of Shared Components Styles -------------- */
 
+body{
+    min-width: 865px;
+    min-height: 611px;
+}
+body{
+    height: calc(100vh - 60px);
+}
+
 button, img{
     height: 25px;
     width: 25px;
@@ -70,5 +84,33 @@ button, img{
     background-color: transparent;
 }
 
+
+.no-gutters {
+    margin-right: 0;
+    margin-left: 0;
+}
+.no-gutters > .col {
+    padding-right: 0;
+    padding-left: 0;
+  }
+.no-gutters > [class*="col-"] {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+
+
+
 /* ------------- End of Shared Components Styles -------------- */
 
+
+/* ------------- Start of Draggable Elements Panel Styles */
+
+.elements-panel{
+    /* width: 100px; */
+    resize: none;
+    min-width: 200px;
+    max-width: 200px;
+}
+
+/* ------------- End of Draggable Elements Panel Styles */

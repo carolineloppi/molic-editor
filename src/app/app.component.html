@@ -1,32 +1,40 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset='utf-8'>
-  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-  <title>Page Title</title>
-  <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <script src='main.js'></script>
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;1,700&display=swap" rel="stylesheet">
-</head>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src='main.js'></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;1,700&display=swap" rel="stylesheet">
+  </head>
 
-<header>
-  <div class="nav">
-    <div class="buttons-group">
-      <div class="button-area"><button class="action-button" id="newDiagram" (click)="createNewDiagram()"><img src="../assets/icons/addIcon.png"></button><span class="action-button-label" (click)="createNewDiagram()">NEW</span></div>
-      <div class="button-area"><button class="action-button" id="exportDiagram" (click)="exportCurrentDiagram()"><img src="../assets/icons/import.png"></button><span class="action-button-label" (click)="exportCurrentDiagram()">EXPORT</span></div>
-      <div class="button-area"><button class="action-button" id="importDiagram" (click)="importNewDiagram()"><img src="../assets/icons/download.png"></button><span class="action-button-label" (click)="importNewDiagram()">IMPORT</span></div>
+  <header>
+    <div class="nav">
+      <div class="buttons-group">
+        <div class="button-area"><button class="action-button" id="newDiagram" (click)="createNewDiagram()"><img src="../assets/icons/addIcon.png"></button><span class="action-button-label" (click)="createNewDiagram()">NEW</span></div>
+        <div class="button-area"><button class="action-button" id="exportDiagram" (click)="exportCurrentDiagram()"><img src="../assets/icons/import.png"></button><span class="action-button-label" (click)="exportCurrentDiagram()">EXPORT</span></div>
+        <div class="button-area"><button class="action-button" id="importDiagram" (click)="importNewDiagram()"><img src="../assets/icons/download.png"></button><span class="action-button-label" (click)="importNewDiagram()">IMPORT</span></div>
+      </div>
+
+      <div class="header-title">MOLIC-BUILDER</div>
+
+      <div class="screenshot-area"><button class="screenshot-button" id="screenshot" (click)="takeScreenshot()"><img src="../assets/icons/camera.png"></button></div>
     </div>
-    
-    <div class="header-title">MOLIC-BUILDER</div>
+  </header>
 
-    <div class="screenshot-area"><button class="screenshot-button" id="screenshot" (click)="takeScreenshot()"><img src="../assets/icons/camera.png"></button></div>
-  </div>
-</header>
+  <body>
+      <div class="row no-gutters">
+        <div class="col elements-panel">
+          <app-draggable-elements-panel></app-draggable-elements-panel>
+        </div>
+        <div class="col">
+          <app-diagram-panel></app-diagram-panel>
+        </div>
+      </div>
+  </body>
 
-<body>
- 
-</body>
 </html>
 
 

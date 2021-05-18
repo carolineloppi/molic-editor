@@ -1,0 +1,26 @@
+/* div{
+    border: 1px solid red;
+} */
+
+  table, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+
+  td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+  }
+
+  .width-smaller{
+      width: 45px;
+  }
+
+  .width-small{
+    width: 50px;
+  }
+
+  .width-large{
+    width: 100px;
+  }
