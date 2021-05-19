@@ -1,4 +1,11 @@
-div{
-    border-right: 1px solid black;
-    border-bottom: 1px solid black;
+.diagram-panel{
+    text-align: center;
+    height: calc(100vh);
+    border-right: 1px solid rgb(175, 175, 175);
+    border-bottom: 1px solid rgb(175, 175, 175);
+}
+
+img{
+    margin-top: calc(50vh - 60px);
+    width: 50px;
 }

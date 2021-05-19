@@ -1,1 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
+  /* Width of the draggable elements */
+
+.width-smaller{
+    width: 45px;
+}
+
+.width-small{
+  width: 50px;
+}
+
+.width-large{
+  width: 100px;
+}

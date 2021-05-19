@@ -16,6 +16,7 @@ header{
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    min-width:fit-content;
 }
 
 .button-area{
@@ -42,6 +43,7 @@ header{
     color: rgba(0, 10, 68, 0.794);
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
+    min-width: fit-content;
 }
 
 .screenshot-area {
@@ -49,6 +51,7 @@ header{
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    min-width: fit-content;
 }
 
 .buttons-group, .screenshot-area {
@@ -69,10 +72,7 @@ header{
 
 /* ------------- Start of Shared Components Styles -------------- */
 
-body{
-    min-width: 865px;
-    min-height: 611px;
-}
+
 body{
     height: calc(100vh - 60px);
 }
@@ -107,7 +107,6 @@ button, img{
 /* ------------- Start of Draggable Elements Panel Styles */
 
 .elements-panel{
-    /* width: 100px; */
     resize: none;
     min-width: 200px;
     max-width: 200px;
