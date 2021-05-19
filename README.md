@@ -1,6 +1,7 @@
 # MoLIC_Builder Project :octocat:
 
 > Project Status: starting
+> Access Current Version On: https://molic-editor.herokuapp.com/
 
 ## Project Documentation
 
