@@ -1,7 +1,7 @@
 
 /* ------------- Start of Toolbar Styles -------------- */
 header{
-    height: 60px;
+    height: 80px;
     background-color: rgba(128, 128, 128, 0.246);
     border-bottom: 2px solid rgb(175, 175, 175);
 }
@@ -14,9 +14,10 @@ header{
 .buttons-group {
     flex: 1;
     display: flex;
-    justify-content: flex-start;
+    margin-left: 60px;
     align-items: center;
     min-width:fit-content;
+    padding-left: 30px;
 }
 
 .button-area{
@@ -27,22 +28,22 @@ header{
 .action-button-label{
     padding-left: 12px;
     display: inline-flexbox;
-    font-size: 12px;
+    font-size: 13px;
     color: rgba(0, 10, 68, 0.794);
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
 }
 
 .header-title {
-    margin-top: 5px;
+    margin-top: 20px;
     flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
     font-size: 30px;
     color: rgba(0, 10, 68, 0.794);
     font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
+    font-weight: 400;
     min-width: fit-content;
 }
 
@@ -52,6 +53,8 @@ header{
     justify-content: flex-end;
     align-items: center;
     min-width: fit-content;
+    padding-right: 30px;
+
 }
 
 .buttons-group, .screenshot-area {

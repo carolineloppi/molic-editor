@@ -1,8 +1,22 @@
+  table{
+    width: 100%;
+    height: calc(100vh - 80px);
+    box-sizing: unset;
+  }
 
   td {
-    border: 1px solid rgb(175, 175, 175);
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     border-collapse: collapse;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     text-align: center;
+    width: 50px;
+    height: 60px;
   }
+
+  tr{
+    box-sizing: unset;
+  }
+
+

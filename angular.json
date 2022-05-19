@@ -120,6 +120,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "molic-editor"
+    }
+  },
+  "defaultProject": "molic-editor",
+  "cli": {
+    "analytics": false
+  }
 }
