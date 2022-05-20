@@ -1,5 +1,22 @@
-<div>
-    <div class="diagram-panel">
-        <img class="width-small" src="../../assets/elements/end-point.png">
+<div class="row no-gutters">
+  <div class="col-2">
+    <div>
+      <table>
+          <tr><td style="border-top: none;"><img class="width-smaller cursor-copy" src="../../assets/elements/start-point.png" (click)="addElement('start-point')"/></td></tr>
+          <tr><td><img class="width-small cursor-copy" src="../../assets/elements/end-point.png" (click)="addElement('end-point')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/scene.png" (click)="addElement('scene')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/ubiquitous.png" (click)="addElement('ubiquitous')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/simple-arrow.png" (click)="addElement('arrow')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/dashed-arrow.png" (click)="addElement('dashed-arrow')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/dashed-scene.png" (click)="addElement('dashed-scene')"></td></tr>
+          <tr><td><img class="width-small cursor-copy" src="../../assets/elements/processing-box.png" (click)="addElement('processing-box')"></td></tr>
+      </table>
     </div>
+  </div>
+
+  <div class="col-10">
+    <div class="diagram-panel">
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
 </div>

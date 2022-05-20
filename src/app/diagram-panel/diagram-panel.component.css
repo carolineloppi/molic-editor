@@ -5,7 +5,22 @@
     border-bottom: 1px solid rgb(175, 175, 175);
 }
 
-img{
-    margin-top: calc(50vh - 60px);
-    width: 50px;
+
+table{
+  width: 100%;
+  height: calc(100vh - 80px);
+  box-sizing: unset;
+}
+
+td {
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-collapse: collapse;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  text-align: center;
+}
+
+tr{
+  box-sizing: unset;
 }

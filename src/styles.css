@@ -13,6 +13,29 @@
     width: 100px;
   }
 
-  body{
-    overflow: hidden;
+  .cursor-copy{
+    cursor: copy;
   }
+
+
+
+  /* ------------- Start of Shared Components Styles -------------- */
+
+
+body{
+    height: calc(100vh - 60px);
+    overflow: hidden;
+}
+
+.no-gutters {
+  margin-right: 0;
+  margin-left: 0;
+}
+.no-gutters > .col {
+  padding-right: 0;
+  padding-left: 0;
+}
+.no-gutters > [class*="col-"] {
+padding-right: 0;
+padding-left: 0;
+}

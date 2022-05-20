@@ -3,7 +3,7 @@
 header{
     height: 80px;
     background-color: rgba(128, 128, 128, 0.246);
-    border-bottom: 2px solid rgb(175, 175, 175);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.246);
 }
 
 .nav {
@@ -70,49 +70,10 @@ header{
     margin-right: 10px;
 }
 
+.toolbar-button, .toolbar-img{
+  height: 25px;
+  width: 25px;
+  border: none;
+  background-color: transparent;
+}
 /* ------------- End of Toolbar Styles -------------- */
-
-
-/* ------------- Start of Shared Components Styles -------------- */
-
-
-body{
-    height: calc(100vh - 60px);
-}
-
-button, img{
-    height: 25px;
-    width: 25px;
-    border: none;
-    background-color: transparent;
-}
-
-
-.no-gutters {
-    margin-right: 0;
-    margin-left: 0;
-}
-.no-gutters > .col {
-    padding-right: 0;
-    padding-left: 0;
-  }
-.no-gutters > [class*="col-"] {
-  padding-right: 0;
-  padding-left: 0;
-}
-
-
-
-
-/* ------------- End of Shared Components Styles -------------- */
-
-
-/* ------------- Start of Draggable Elements Panel Styles */
-
-.elements-panel{
-    resize: none;
-    min-width: 200px;
-    max-width: 200px;
-}
-
-/* ------------- End of Draggable Elements Panel Styles */
