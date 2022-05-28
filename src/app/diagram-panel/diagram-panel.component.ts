@@ -30,61 +30,46 @@ export class DiagramPanelComponent implements OnInit {
     this.outputContent = null;
   }
 
-  extend(obj, id) {
-    obj.toObject = (function (toObject) {
-      return function () {
-        return fabric.util.object.extend(toObject.call(this), {
-          id: id,
-        });
-      };
-    })(obj.toObject);
-  }
-  //======= this is used to generate random id of every object ===========
-  randomId() {
-    return Math.floor(Math.random() * 999999) + 1;
-  }
-  //== this function is used to active the object after creation ==========
-  selectItemAfterAdded(obj) {
+  // Selects the object on Canvas.
+  selectCanvasObject(obj): void {
     this.canvas.discardActiveObject().renderAll();
     this.canvas.setActiveObject(obj);
   }
 
-  //Creates the selected element and add to Canvas.
-  addElement(figure) {
-    let add: any;
+  // Creates the selected element and adds it to Canvas.
+  addElement(figure): void {
+    let newElement: any;
     switch (figure) {
       case 'arrow':
-        add = this.createArrowElement();
+        newElement = this.createArrowElement();
         break;
       case 'dashed-arrow':
-        add = this.createDashedArrowElement();
+        newElement = this.createDashedArrowElement();
         break;
       case 'scene':
-        add = this.createSceneElement();
+        newElement = this.createSceneElement();
         break;
       case 'dashed-scene':
-        add = this.createDashedSceneElement();
+        newElement = this.createDashedSceneElement();
         break;
-
       case 'ubiquitous':
-        add = this.createUbiquitousElement();
+        newElement = this.createUbiquitousElement();
         break;
       case 'processing-box':
-        add = this.createProcessingBoxElement();
+        newElement = this.createProcessingBoxElement();
         break;
       case 'start-point':
-        add = this.createStartPointElement();
+        newElement = this.createStartPointElement();
         break;
       case 'end-point':
-        add = this.createEndPointElement();
+        newElement = this.createEndPointElement();
         break;
     }
-    this.extend(add, this.randomId());
-    this.canvas.add(add);
-    this.selectItemAfterAdded(add);
+    this.canvas.add(newElement);
+    this.selectCanvasObject(newElement);
   }
 
-  createArrowElement() {
+  createArrowElement(): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Line([50, 200, 148.5, 200], {
@@ -106,7 +91,7 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  createDashedArrowElement() {
+  createDashedArrowElement(): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Line([50, 200, 148.5, 200], {
@@ -129,7 +114,7 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  createSceneElement() {
+  createSceneElement(): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Rect({
@@ -168,7 +153,7 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  createDashedSceneElement() {
+  createDashedSceneElement(): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Rect({
@@ -208,7 +193,7 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  createEndPointElement() {
+  createEndPointElement(): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Circle({
@@ -230,7 +215,7 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  createStartPointElement() {
+  createStartPointElement(): fabric.Circle {
     return new fabric.Circle({
       radius: 15,
       left: 10,
@@ -241,7 +226,7 @@ export class DiagramPanelComponent implements OnInit {
     });
   }
 
-  createProcessingBoxElement() {
+  createProcessingBoxElement(): fabric.Rect {
     return new fabric.Rect({
       width: 30,
       height: 30,
@@ -254,7 +239,7 @@ export class DiagramPanelComponent implements OnInit {
     });
   }
 
-  createUbiquitousElement() {
+  createUbiquitousElement(): fabric.Rect {
     return new fabric.Rect({
       radius: 2,
       width: 100,
