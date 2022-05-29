@@ -1,3 +1,4 @@
+import { identifierModuleUrl } from '@angular/compiler';
 import { Component, Input, OnInit } from '@angular/core';
 import { fabric } from 'fabric';
 
@@ -41,40 +42,122 @@ export class DiagramPanelComponent implements OnInit {
     let newElement: any;
     switch (figure) {
       case 'arrow':
-        newElement = this.createArrowElement();
+        newElement = this.connectTwoElements(
+          'arrow',
+          'scene1',
+          'processamento1'
+        );
         break;
       case 'dashed-arrow':
-        newElement = this.createDashedArrowElement();
+        newElement = this.connectTwoElements(
+          'dashed-arrow',
+          'ubiquitous1',
+          'startPoint1'
+        );
         break;
       case 'scene':
-        newElement = this.createSceneElement();
+        newElement = this.createSceneElement('scene1');
         break;
       case 'dashed-scene':
-        newElement = this.createDashedSceneElement();
+        newElement = this.createDashedSceneElement('dashedScene1');
         break;
       case 'ubiquitous':
-        newElement = this.createUbiquitousElement();
+        newElement = this.createUbiquitousElement('ubiquitous1');
         break;
       case 'processing-box':
-        newElement = this.createProcessingBoxElement();
+        newElement = this.createProcessingBoxElement('processamento1');
         break;
       case 'start-point':
-        newElement = this.createStartPointElement();
+        newElement = this.createStartPointElement('startPoint1');
         break;
       case 'end-point':
-        newElement = this.createEndPointElement();
+        newElement = this.createEndPointElement('endPoint1');
         break;
     }
-    this.canvas.add(newElement);
-    this.selectCanvasObject(newElement);
+    if (newElement) {
+      this.canvas.add(newElement);
+      this.selectCanvasObject(newElement);
+    }
   }
 
-  createArrowElement(): fabric.Group {
+  connectTwoElements(
+    arrowType: string,
+    originElementId: string,
+    targetElementId: string
+  ): fabric.Group {
+    if (this.canvas.getObjects().length < 2) {
+      console.log('There are not enough elements to create a connection');
+      return;
+    }
+
+    const origin: fabric.Group = this.canvas
+      .getObjects()
+      .filter((el) => el.id === originElementId)[0];
+
+    const target: fabric.Group = this.canvas
+      .getObjects()
+      .filter((el) => el.id === targetElementId)[0];
+
+    console.log('origin', origin);
+    console.log('target', target);
+
+    if (!origin) {
+      console.log('Origin element is not available to connect with');
+      return;
+    }
+
+    if (!target) {
+      console.log('Target element is not available to connect with');
+      return;
+    }
+
+    let arrow: fabric.Group;
+    switch (arrowType) {
+      case 'dashed-arrow':
+        arrow = this.createDashedArrowElement(origin, target);
+        break;
+      case 'arrow':
+        arrow = this.createArrowElement(origin, target);
+        break;
+    }
+
+    return arrow;
+  }
+
+  getArrowCoords(originElement, targetElement): number[] {
+    console.log('originElement', originElement);
+    console.log('targetElement', targetElement);
+
+    // Find Arrow Start Point Coords
+    const originTrY = originElement.aCoords.tr.y;
+    const originBrY = originElement.aCoords.br.y;
+    const originTrX = originElement.aCoords.tr.x;
+
+    const arrowStartX = originTrX;
+    const arrowStartY = originTrY + (originBrY - originTrY) / 2;
+
+    // Find Arrow End Point Coords
+    const targetTlY = targetElement.aCoords.tl.y;
+    const targetBlY = targetElement.aCoords.bl.y;
+    const targetTlX = targetElement.aCoords.tl.x;
+
+    const arrowEndX = targetTlX;
+    const arrowEndY = targetTlY + (targetBlY - targetTlY) / 2;
+
+    console.log('Start Arrow X: ', arrowStartX);
+    console.log('Start Arrow Y: ', arrowStartY);
+
+    console.log('End Arrow X: ', arrowEndX);
+    console.log('End Arrow Y: ', arrowEndY);
+
+    return [arrowStartX, arrowStartY, arrowEndX, arrowEndY];
+  }
+
+  createArrowElement(originElement, targetElement): fabric.Group {
+    const coords = this.getArrowCoords(originElement, targetElement);
     return new fabric.Group(
       [
-        new fabric.Line([50, 200, 148.5, 200], {
-          left: 10,
-          top: 30,
+        new fabric.Line(coords, {
           stroke: '#908C8C',
           strokeWidth: 1.5,
         }),
@@ -82,8 +165,8 @@ export class DiagramPanelComponent implements OnInit {
           width: 10,
           height: 15,
           fill: '#908C8C',
-          left: 120,
-          top: 25,
+          left: coords[2] + 1,
+          top: coords[3] - 5,
           angle: 90,
         }),
       ],
@@ -91,12 +174,11 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  createDashedArrowElement(): fabric.Group {
+  createDashedArrowElement(originElement, targetElement): fabric.Group {
+    const coords = this.getArrowCoords(originElement, targetElement);
     return new fabric.Group(
       [
-        new fabric.Line([50, 200, 148.5, 200], {
-          left: 10,
-          top: 30,
+        new fabric.Line(coords, {
           stroke: '#908C8C',
           strokeWidth: 1.5,
           strokeDashArray: [3, 3],
@@ -105,8 +187,8 @@ export class DiagramPanelComponent implements OnInit {
           width: 10,
           height: 15,
           fill: '#908C8C',
-          left: 120,
-          top: 25,
+          left: coords[2] + 1,
+          top: coords[3] - 5,
           angle: 90,
         }),
       ],
@@ -114,7 +196,7 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  createSceneElement(): fabric.Group {
+  createSceneElement(sceneName: string): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Rect({
@@ -149,11 +231,11 @@ export class DiagramPanelComponent implements OnInit {
           hasRotatingPoint: true,
         }),
       ],
-      { hasBorders: false, hasControls: false }
+      { id: sceneName, hasBorders: false, hasControls: false }
     );
   }
 
-  createDashedSceneElement(): fabric.Group {
+  createDashedSceneElement(sceneName: string): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Rect({
@@ -189,11 +271,11 @@ export class DiagramPanelComponent implements OnInit {
           hasRotatingPoint: true,
         }),
       ],
-      { hasBorders: false, hasControls: false }
+      { id: sceneName, hasBorders: false, hasControls: false }
     );
   }
 
-  createEndPointElement(): fabric.Group {
+  createEndPointElement(identifier: string): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Circle({
@@ -211,12 +293,13 @@ export class DiagramPanelComponent implements OnInit {
           fill: '#000',
         }),
       ],
-      { hasBorders: false, hasControls: false }
+      { id: identifier, hasBorders: false, hasControls: false }
     );
   }
 
-  createStartPointElement(): fabric.Circle {
+  createStartPointElement(identifier: string): fabric.Circle {
     return new fabric.Circle({
+      id: identifier,
       radius: 15,
       left: 10,
       top: 10,
@@ -226,8 +309,9 @@ export class DiagramPanelComponent implements OnInit {
     });
   }
 
-  createProcessingBoxElement(): fabric.Rect {
+  createProcessingBoxElement(identifier: string): fabric.Rect {
     return new fabric.Rect({
+      id: identifier,
       width: 30,
       height: 30,
       left: 10,
@@ -239,8 +323,9 @@ export class DiagramPanelComponent implements OnInit {
     });
   }
 
-  createUbiquitousElement(): fabric.Rect {
+  createUbiquitousElement(identifier: string): fabric.Rect {
     return new fabric.Rect({
+      id: identifier,
       radius: 2,
       width: 100,
       height: 35,
@@ -255,5 +340,10 @@ export class DiagramPanelComponent implements OnInit {
       hasControls: false,
       hasBorders: false,
     });
+  }
+
+  // Remove all elements from Canvas.
+  public clearCanvas(): void {
+    this.canvas.clear();
   }
 }
