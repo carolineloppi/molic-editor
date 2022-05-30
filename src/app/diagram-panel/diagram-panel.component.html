@@ -1,16 +1,53 @@
 <div class="row no-gutters">
   <div class="col-2">
-    <div>
+    <div *ngIf="viewScreen == 'elementsPanel'">
       <table>
-          <tr><td style="border-top: none;"><img class="width-smaller cursor-copy" src="../../assets/elements/start-point.png" (click)="addElement('start-point')"/></td></tr>
-          <tr><td><img class="width-small cursor-copy" src="../../assets/elements/end-point.png" (click)="addElement('end-point')"></td></tr>
-          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/scene.png" (click)="addElement('scene')"></td></tr>
-          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/ubiquitous.png" (click)="addElement('ubiquitous')"></td></tr>
-          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/simple-arrow.png" (click)="addElement('arrow')"></td></tr>
-          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/dashed-arrow.png" (click)="addElement('dashed-arrow')"></td></tr>
-          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/dashed-scene.png" (click)="addElement('dashed-scene')"></td></tr>
-          <tr><td><img class="width-small cursor-copy" src="../../assets/elements/processing-box.png" (click)="addElement('processing-box')"></td></tr>
+          <tr><td style="border-top: none;"><img class="width-smaller cursor-copy" src="../../assets/elements/start-point.png" (click)="askForElementProperties('start-point')"/></td></tr>
+          <tr><td><img class="width-small cursor-copy" src="../../assets/elements/end-point.png" (click)="askForElementProperties('end-point')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/scene.png" (click)="askForElementProperties('scene')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/ubiquitous.png" (click)="askForElementProperties('ubiquitous')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/simple-arrow.png" (click)="askForElementProperties('arrow')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/dashed-arrow.png" (click)="askForElementProperties('dashed-arrow')"></td></tr>
+          <tr><td><img class="width-large cursor-copy" src="../../assets/elements/dashed-scene.png" (click)="askForElementProperties('dashed-scene')"></td></tr>
+          <tr><td><img class="width-small cursor-copy" src="../../assets/elements/processing-box.png" (click)="askForElementProperties('processing-box')"></td></tr>
       </table>
+    </div>
+    <div *ngIf="viewScreen == 'additionalPropertiesPanel'" class="additional-properties-panel">
+      <div class="properties-title"> Additional Properties </div>
+      <form [formGroup]="additionalPropertiesFormGroup" (ngSubmit)="saveAdditionalProperties(additionalPropertiesFormGroup.value)">
+          <label class="inline-input-label" for="topic">Topic*:</label>
+          <input class="inline-input" type="text" id="topic" formControlName="topic"><br><br>
+          <label class="inline-input-label" for="dialogs">Dialog(s)*:</label>
+          <input class="long-input" type="text" id="dialogs" formControlName="dialogs"><br><br>
+          <div class="action-buttons">
+            <button class="action-button-item" type="submit"><img class="submit-img" src="../assets/icons/ok.png"></button>
+            <button class="action-button-item" type="button" (click)="cancelElementCreation('additionalProperties')"><img class="cancel-img" src="../assets/icons/cancel.png"></button>
+          </div>
+
+      </form>
+    </div>
+
+    <div *ngIf="viewScreen == 'transitionPropertiesPanel'" class="additional-properties-panel">
+      <div class="properties-title"> Transition Properties </div>
+      <form [formGroup]="transitionalPropertiesFormGroup" (ngSubmit)="saveTransitionalProperties(transitionalPropertiesFormGroup.value)">
+          <label class="inline-input-label" for="source">Source Element*:</label>
+          <select class="inline-input" id="source" formControlName="source">
+            <option *ngFor="let item of this.canvas.getObjects()" [value]="item.id">{{item.id}}</option>
+          </select>
+
+          <label class="inline-input-label" for="target">Target Element*:</label>
+          <select class="inline-input" id="target" formControlName="target">
+            <option *ngFor="let item of this.canvas.getObjects()" [value]="item.id">{{item.id}}</option>
+          </select>
+
+          <label class="inline-input-label" for="utterance">Utterance*:</label>
+          <input class="long-input" type="text" id="utterance" formControlName="utterance"><br><br>
+          <div class="action-buttons">
+            <button class="action-button-item" type="submit"><img class="submit-img" src="../assets/icons/ok.png"></button>
+            <button class="action-button-item" type="button" (click)="cancelElementCreation('transitionalProperties')"><img class="cancel-img" src="../assets/icons/cancel.png"></button>
+          </div>
+
+      </form>
     </div>
   </div>
 

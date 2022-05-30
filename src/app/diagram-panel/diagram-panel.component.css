@@ -5,6 +5,63 @@
     border-bottom: 1px solid rgb(175, 175, 175);
 }
 
+.additional-properties-panel{
+  background-color: rgba(128, 128, 128, 0.144);
+  height: calc(100vh - 80px);
+  width: 100%;
+}
+
+.properties-title{
+  height: 50px;
+  background-color: white;
+  border: 1px solid rgba(128, 128, 128, 0.246);
+  text-align: center;
+  padding-top: 13px;
+  margin-bottom: 100px;
+}
+
+.inline-input-label{
+  width: 100%;
+  margin-left: 10px;
+  margin-bottom: 5px;
+
+}
+
+.inline-input{
+  width: 90%;
+  height: 30px;
+  margin-left: 5%;
+  margin-bottom: 30px;
+}
+
+.long-input{
+  width: 90%;
+  height: 90px;
+  margin-left: 5%;
+  margin-bottom: 30px;
+}
+.action-buttons{
+  margin-top: 60px;
+  margin-right: 10px;
+  width: 100%;
+}
+.action-button-item{
+  border: none !important;
+  padding: 0;
+  margin-left: 5px;
+  float: right;
+}
+
+.submit-img{
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.cancel-img{
+  width: 30px;
+  height: 30px;
+}
 
 table{
   width: 100%;

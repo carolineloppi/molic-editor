@@ -1,5 +1,6 @@
-import { identifierModuleUrl } from '@angular/compiler';
 import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+
 import { fabric } from 'fabric';
 
 @Component({
@@ -11,13 +12,28 @@ export class DiagramPanelComponent implements OnInit {
   private canvas: any;
   textString: string;
   outputContent: string;
+  viewScreen: string;
+  additionalPropertiesFormGroup;
+  transitionalPropertiesFormGroup;
+  currentRenderingFigure: any;
 
   private size: any = {
     width: 1200,
     height: 1000,
   };
 
-  constructor() {}
+  constructor(private formBuilder: FormBuilder) {
+    this.additionalPropertiesFormGroup = this.formBuilder.group({
+      topic: '',
+      dialogs: '',
+    });
+
+    this.transitionalPropertiesFormGroup = this.formBuilder.group({
+      source: '',
+      target: '',
+      utterance: '',
+    });
+  }
 
   ngOnInit(): void {
     this.canvas = new fabric.Canvas('canvas', {
@@ -29,6 +45,7 @@ export class DiagramPanelComponent implements OnInit {
     this.canvas.setWidth(this.size.width);
     this.canvas.setHeight(this.size.height);
     this.outputContent = null;
+    this.viewScreen = 'elementsPanel';
   }
 
   // Selects the object on Canvas.
@@ -38,52 +55,52 @@ export class DiagramPanelComponent implements OnInit {
   }
 
   // Creates the selected element and adds it to Canvas.
-  addElement(figure): void {
-    let newElement: any;
+  askForElementProperties(figure): void {
+    this.currentRenderingFigure = figure;
+
     switch (figure) {
       case 'arrow':
-        newElement = this.connectTwoElements(
-          'arrow',
-          'scene1',
-          'processamento1'
-        );
-        break;
       case 'dashed-arrow':
-        newElement = this.connectTwoElements(
-          'dashed-arrow',
-          'ubiquitous1',
-          'startPoint1'
-        );
+        this.viewScreen = 'transitionPropertiesPanel';
         break;
-      case 'scene':
-        newElement = this.createSceneElement('scene1');
-        break;
-      case 'dashed-scene':
-        newElement = this.createDashedSceneElement('dashedScene1');
-        break;
-      case 'ubiquitous':
-        newElement = this.createUbiquitousElement('ubiquitous1');
-        break;
-      case 'processing-box':
-        newElement = this.createProcessingBoxElement('processamento1');
-        break;
-      case 'start-point':
-        newElement = this.createStartPointElement('startPoint1');
-        break;
-      case 'end-point':
-        newElement = this.createEndPointElement('endPoint1');
-        break;
+
+      default:
+        this.viewScreen = 'additionalPropertiesPanel';
+        return;
     }
-    if (newElement) {
-      this.canvas.add(newElement);
-      this.selectCanvasObject(newElement);
+  }
+
+  renderElement(elementId: string, description?: string): any {
+    if (!elementId) {
+      return;
+    }
+
+    switch (this.currentRenderingFigure) {
+      case 'scene':
+        return this.createSceneElement(
+          elementId,
+          description ? description : ''
+        );
+      case 'dashed-scene':
+        return this.createDashedSceneElement(
+          elementId,
+          description ? description : ''
+        );
+      case 'ubiquitous':
+        return this.createUbiquitousElement(elementId);
+      case 'processing-box':
+        return this.createProcessingBoxElement(elementId);
+      case 'start-point':
+        return this.createStartPointElement(elementId);
+      case 'end-point':
+        return this.createEndPointElement(elementId);
     }
   }
 
   connectTwoElements(
-    arrowType: string,
     originElementId: string,
-    targetElementId: string
+    targetElementId: string,
+    utterance: string
   ): fabric.Group {
     if (this.canvas.getObjects().length < 2) {
       console.log('There are not enough elements to create a connection');
@@ -98,9 +115,6 @@ export class DiagramPanelComponent implements OnInit {
       .getObjects()
       .filter((el) => el.id === targetElementId)[0];
 
-    console.log('origin', origin);
-    console.log('target', target);
-
     if (!origin) {
       console.log('Origin element is not available to connect with');
       return;
@@ -111,17 +125,12 @@ export class DiagramPanelComponent implements OnInit {
       return;
     }
 
-    let arrow: fabric.Group;
-    switch (arrowType) {
+    switch (this.currentRenderingFigure) {
       case 'dashed-arrow':
-        arrow = this.createDashedArrowElement(origin, target);
-        break;
+        return this.createDashedArrowElement(origin, target, utterance);
       case 'arrow':
-        arrow = this.createArrowElement(origin, target);
-        break;
+        return this.createArrowElement(origin, target, utterance);
     }
-
-    return arrow;
   }
 
   getArrowCoords(originElement, targetElement): number[] {
@@ -153,7 +162,11 @@ export class DiagramPanelComponent implements OnInit {
     return [arrowStartX, arrowStartY, arrowEndX, arrowEndY];
   }
 
-  createArrowElement(originElement, targetElement): fabric.Group {
+  createArrowElement(
+    originElement,
+    targetElement,
+    utterance: string
+  ): fabric.Group {
     const coords = this.getArrowCoords(originElement, targetElement);
     return new fabric.Group(
       [
@@ -169,12 +182,27 @@ export class DiagramPanelComponent implements OnInit {
           top: coords[3] - 5,
           angle: 90,
         }),
+        new fabric.IText(utterance, {
+          left: coords[2] - 3,
+          top: coords[3] - 5,
+          fontFamily: 'helvetica',
+          angle: 0,
+          fill: '#000000',
+          scaleX: 0.5,
+          scaleY: 0.5,
+          fontSize: 30,
+          hasRotatingPoint: true,
+        }),
       ],
       { hasBorders: false, hasControls: false }
     );
   }
 
-  createDashedArrowElement(originElement, targetElement): fabric.Group {
+  createDashedArrowElement(
+    originElement,
+    targetElement,
+    utterance: string
+  ): fabric.Group {
     const coords = this.getArrowCoords(originElement, targetElement);
     return new fabric.Group(
       [
@@ -191,12 +219,23 @@ export class DiagramPanelComponent implements OnInit {
           top: coords[3] - 5,
           angle: 90,
         }),
+        new fabric.IText(utterance, {
+          left: coords[0] - 10,
+          top: coords[3] - 5,
+          fontFamily: 'helvetica',
+          angle: 0,
+          fill: '#000000',
+          scaleX: 0.5,
+          scaleY: 0.5,
+          fontSize: 30,
+          hasRotatingPoint: true,
+        }),
       ],
       { hasBorders: false, hasControls: false }
     );
   }
 
-  createSceneElement(sceneName: string): fabric.Group {
+  createSceneElement(sceneName: string, dialogs: string): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Rect({
@@ -219,9 +258,20 @@ export class DiagramPanelComponent implements OnInit {
           top: 30,
           stroke: '#908C8C',
         }),
-        new fabric.IText('Scene', {
+        new fabric.IText(sceneName, {
           left: 38,
           top: 14,
+          fontFamily: 'helvetica',
+          angle: 0,
+          fill: '#000000',
+          scaleX: 0.5,
+          scaleY: 0.5,
+          fontSize: 30,
+          hasRotatingPoint: true,
+        }),
+        new fabric.IText(dialogs, {
+          left: 38,
+          top: 34,
           fontFamily: 'helvetica',
           angle: 0,
           fill: '#000000',
@@ -235,7 +285,7 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  createDashedSceneElement(sceneName: string): fabric.Group {
+  createDashedSceneElement(sceneName: string, dialogs: string): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Rect({
@@ -259,9 +309,20 @@ export class DiagramPanelComponent implements OnInit {
           stroke: '#908C8C',
           strokeDashArray: [5, 5],
         }),
-        new fabric.IText('Scene', {
+        new fabric.IText(sceneName, {
           left: 38,
           top: 14,
+          fontFamily: 'helvetica',
+          angle: 0,
+          fill: '#000000',
+          scaleX: 0.5,
+          scaleY: 0.5,
+          fontSize: 30,
+          hasRotatingPoint: true,
+        }),
+        new fabric.IText(dialogs, {
+          left: 38,
+          top: 34,
           fontFamily: 'helvetica',
           angle: 0,
           fill: '#000000',
@@ -344,6 +405,63 @@ export class DiagramPanelComponent implements OnInit {
 
   // Remove all elements from Canvas.
   public clearCanvas(): void {
-    this.canvas.clear();
+    if (this.canvas) {
+      this.canvas.clear();
+    }
+  }
+
+  saveAdditionalProperties(formData): void {
+    const topicKey = 'topic';
+    const dialogsKey = 'dialogs';
+
+    const topic = formData[topicKey];
+    const dialogs = formData[dialogsKey];
+
+    // TODO: validate
+
+    // create element
+    const newElement = this.renderElement(topic, dialogs);
+    if (newElement) {
+      this.canvas.add(newElement);
+      this.selectCanvasObject(newElement);
+    }
+
+    this.viewScreen = 'elementsPanel';
+    this.additionalPropertiesFormGroup.reset();
+  }
+
+  saveTransitionalProperties(formData): void {
+    const sourceKey = 'source';
+    const targetKey = 'target';
+    const utteranceKey = 'utterance';
+
+    const source = formData[sourceKey];
+    const target = formData[targetKey];
+    const utterance = formData[utteranceKey];
+
+    const newElement = this.connectTwoElements(source, target, utterance);
+    if (newElement) {
+      this.canvas.add(newElement);
+      this.selectCanvasObject(newElement);
+    }
+
+    this.viewScreen = 'elementsPanel';
+    this.transitionalPropertiesFormGroup.reset();
+  }
+
+  // Cancel the elements creation and removes it from Canvas.
+  cancelElementCreation(elementType: string): void {
+    switch (elementType) {
+      case 'additionalProperties':
+        this.additionalPropertiesFormGroup.reset();
+        break;
+
+      case 'transitionalProperties':
+        this.transitionalPropertiesFormGroup.reset();
+        break;
+    }
+
+    this.canvas.remove(this.canvas.getActiveObject());
+    this.viewScreen = 'elementsPanel';
   }
 }

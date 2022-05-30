@@ -1,16 +1,14 @@
+import { DiagramPanelComponent } from './diagram-panel/diagram-panel.component';
 import { TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
-      declarations: [
-        AppComponent
-      ],
+      imports: [RouterTestingModule, FormsModule, ReactiveFormsModule],
+      declarations: [AppComponent, DiagramPanelComponent],
     }).compileComponents();
   });
 
@@ -40,7 +38,6 @@ describe('AppComponent', () => {
     // Check if the method createNewDiagram was called (once) after clicking the newDiagram button
     expect(app.createNewDiagram).toHaveBeenCalled();
     expect(app.createNewDiagram).toHaveBeenCalledTimes(1);
-
   });
 
   it('should call exportCurrentDiagram when export button is clicked', () => {
@@ -57,7 +54,6 @@ describe('AppComponent', () => {
     // Check if the method exportCurrentDiagram was called (once) after clicking the exportDiagram button
     expect(app.exportCurrentDiagram).toHaveBeenCalled();
     expect(app.exportCurrentDiagram).toHaveBeenCalledTimes(1);
-
   });
 
   it('should call importNewDiagram when import button is clicked', () => {
@@ -74,7 +70,6 @@ describe('AppComponent', () => {
     // Check if the method importNewDiagram was called (once) after clicking the importDiagram button
     expect(app.importNewDiagram).toHaveBeenCalled();
     expect(app.importNewDiagram).toHaveBeenCalledTimes(1);
-
   });
 
   it('should call takeScreenshot when screenshot button is clicked', () => {
@@ -91,7 +86,5 @@ describe('AppComponent', () => {
     // Check if the method takeScreenshot was called (once) after clicking the screenshot button
     expect(app.takeScreenshot).toHaveBeenCalled();
     expect(app.takeScreenshot).toHaveBeenCalledTimes(1);
-
   });
-
 });
