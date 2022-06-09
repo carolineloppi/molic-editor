@@ -23,6 +23,9 @@ export class AppComponent {
    */
   public createNewDiagram(): void {
     console.log('Canvas will be reseted!');
+    if (!this.diagramPanel) {
+      return;
+    }
     this.diagramPanel.clearCanvas();
   }
   /**

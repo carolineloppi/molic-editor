@@ -22,6 +22,10 @@ export class DiagramPanelComponent implements OnInit {
     height: 1000,
   };
 
+  // TODO: atualizar ao carregar o XML.
+
+  elementsIdMap = new Map<string, number>();
+
   constructor(private formBuilder: FormBuilder) {
     this.additionalPropertiesFormGroup = this.formBuilder.group({
       topic: '',
@@ -33,6 +37,11 @@ export class DiagramPanelComponent implements OnInit {
       target: '',
       utterance: '',
     });
+
+    this.elementsIdMap.set('ubiquitous', 0);
+    this.elementsIdMap.set('processing-box', 0);
+    this.elementsIdMap.set('start-point', 0);
+    this.elementsIdMap.set('end-point', 0);
   }
 
   ngOnInit(): void {
@@ -55,7 +64,7 @@ export class DiagramPanelComponent implements OnInit {
   }
 
   // Creates the selected element and adds it to Canvas.
-  askForElementProperties(figure): void {
+  createElement(figure): void {
     this.currentRenderingFigure = figure;
 
     switch (figure) {
@@ -64,10 +73,17 @@ export class DiagramPanelComponent implements OnInit {
         this.viewScreen = 'transitionPropertiesPanel';
         break;
 
-      default:
+      case 'scene':
+      case 'dashed-scene':
         this.viewScreen = 'additionalPropertiesPanel';
+        break;
+
+      default:
+        this.createSimpleElement();
         return;
     }
+
+    // TODO: criar node e edge e adicionar aos arrays do diagram.ts
   }
 
   renderElement(elementId: string, description?: string): any {
@@ -87,14 +103,27 @@ export class DiagramPanelComponent implements OnInit {
           description ? description : ''
         );
       case 'ubiquitous':
-        return this.createUbiquitousElement(elementId);
+        return this.createUbiquitousElement(
+          'Ubiquitous - ' + this.elementsIdMap.get('ubiquitous')
+        );
       case 'processing-box':
-        return this.createProcessingBoxElement(elementId);
+        return this.createProcessingBoxElement(
+          'Processing Box - ' + this.elementsIdMap.get('processing-box')
+        );
       case 'start-point':
-        return this.createStartPointElement(elementId);
+        return this.createStartPointElement(
+          'Start Point - ' + this.elementsIdMap.get('start-point')
+        );
       case 'end-point':
-        return this.createEndPointElement(elementId);
+        return this.createEndPointElement(
+          'End Point - ' + this.elementsIdMap.get('end-point')
+        );
     }
+  }
+
+  updateIdMapCount(elementType: string): void {
+    const currentValue: number = this.elementsIdMap.get(elementType);
+    this.elementsIdMap.set(elementType, currentValue + 1);
   }
 
   connectTwoElements(
@@ -410,27 +439,20 @@ export class DiagramPanelComponent implements OnInit {
     }
   }
 
-  saveAdditionalProperties(formData): void {
+  createSceneWithAdditionalProperties(formData): void {
     const topicKey = 'topic';
     const dialogsKey = 'dialogs';
 
     const topic = formData[topicKey];
     const dialogs = formData[dialogsKey];
 
-    // TODO: validate
-
     // create element
-    const newElement = this.renderElement(topic, dialogs);
-    if (newElement) {
-      this.canvas.add(newElement);
-      this.selectCanvasObject(newElement);
-    }
-
     this.viewScreen = 'elementsPanel';
     this.additionalPropertiesFormGroup.reset();
+    this.addElementToCanvas(this.renderElement(topic, dialogs));
   }
 
-  saveTransitionalProperties(formData): void {
+  createTransitionalElement(formData): void {
     const sourceKey = 'source';
     const targetKey = 'target';
     const utteranceKey = 'utterance';
@@ -439,14 +461,23 @@ export class DiagramPanelComponent implements OnInit {
     const target = formData[targetKey];
     const utterance = formData[utteranceKey];
 
-    const newElement = this.connectTwoElements(source, target, utterance);
+    this.viewScreen = 'elementsPanel';
+    this.transitionalPropertiesFormGroup.reset();
+    this.addElementToCanvas(this.connectTwoElements(source, target, utterance));
+  }
+
+  createSimpleElement(): void {
+    const elementId = this.elementsIdMap.get(this.currentRenderingFigure);
+
+    this.updateIdMapCount(this.currentRenderingFigure);
+    this.addElementToCanvas(this.renderElement(elementId.toString()));
+  }
+
+  addElementToCanvas(newElement: any): void {
     if (newElement) {
       this.canvas.add(newElement);
       this.selectCanvasObject(newElement);
     }
-
-    this.viewScreen = 'elementsPanel';
-    this.transitionalPropertiesFormGroup.reset();
   }
 
   // Cancel the elements creation and removes it from Canvas.
