@@ -1,5 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { EdgeTypeEnum } from './../model/edge-type';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { SimpleNodeTypeEnum } from './../model/simple-node-type';
 
 import { fabric } from 'fabric';
 
@@ -10,20 +12,31 @@ import { fabric } from 'fabric';
 })
 export class DiagramPanelComponent implements OnInit {
   private canvas: any;
-  textString: string;
-  outputContent: string;
+
+  // Panel currently visible.
+  // Values are: elementsPanel, transitionPropertiesPanel and additionalPropertiesPanel
   viewScreen: string;
+
+  // Form group of scene properties.
   additionalPropertiesFormGroup;
+
+  // Form group of edge property.
   transitionalPropertiesFormGroup;
+
+  // Active figure under construction.
   currentRenderingFigure: any;
 
+  // Canvas default size.
   private size: any = {
     width: 1200,
     height: 1000,
   };
 
-  // TODO: atualizar ao carregar o XML.
+  // Enables enum acess to HTMl.
+  SimpleNodeType = SimpleNodeTypeEnum;
+  EdgeType = EdgeTypeEnum;
 
+  // Map to keep track of elements id.
   elementsIdMap = new Map<string, number>();
 
   constructor(private formBuilder: FormBuilder) {
@@ -38,10 +51,15 @@ export class DiagramPanelComponent implements OnInit {
       utterance: '',
     });
 
-    this.elementsIdMap.set('ubiquitous', 0);
-    this.elementsIdMap.set('processing-box', 0);
-    this.elementsIdMap.set('start-point', 0);
-    this.elementsIdMap.set('end-point', 0);
+    // TODO: atualizar ids iniciais ao carregar o XML.
+    this.elementsIdMap.set(SimpleNodeTypeEnum.ubiquitous_acess, 0);
+    this.elementsIdMap.set(SimpleNodeTypeEnum.system_process, 0);
+    this.elementsIdMap.set(SimpleNodeTypeEnum.start_node, 0);
+    this.elementsIdMap.set(SimpleNodeTypeEnum.end_node, 0);
+    this.elementsIdMap.set(EdgeTypeEnum.edge, 0);
+    this.elementsIdMap.set(EdgeTypeEnum.dashed_edge, 0);
+    this.elementsIdMap.set(SimpleNodeTypeEnum.scene, 0);
+    this.elementsIdMap.set(SimpleNodeTypeEnum.dashed_scene, 0);
   }
 
   ngOnInit(): void {
@@ -50,10 +68,8 @@ export class DiagramPanelComponent implements OnInit {
       selection: true,
       selectionBorderColor: 'blue',
     });
-    this.textString = null;
     this.canvas.setWidth(this.size.width);
     this.canvas.setHeight(this.size.height);
-    this.outputContent = null;
     this.viewScreen = 'elementsPanel';
   }
 
@@ -68,13 +84,13 @@ export class DiagramPanelComponent implements OnInit {
     this.currentRenderingFigure = figure;
 
     switch (figure) {
-      case 'arrow':
-      case 'dashed-arrow':
+      case EdgeTypeEnum.edge:
+      case EdgeTypeEnum.dashed_edge:
         this.viewScreen = 'transitionPropertiesPanel';
         break;
 
-      case 'scene':
-      case 'dashed-scene':
+      case SimpleNodeTypeEnum.scene:
+      case SimpleNodeTypeEnum.dashed_scene:
         this.viewScreen = 'additionalPropertiesPanel';
         break;
 
@@ -86,47 +102,70 @@ export class DiagramPanelComponent implements OnInit {
     // TODO: criar node e edge e adicionar aos arrays do diagram.ts
   }
 
-  renderElement(elementId: string, description?: string): any {
+  // Calls the canvas rendering functions for each non-edge element
+  renderElement(elementId: string, topic?: string, description?: string): any {
     if (!elementId) {
       return;
     }
 
     switch (this.currentRenderingFigure) {
-      case 'scene':
+      case SimpleNodeTypeEnum.scene:
         return this.createSceneElement(
           elementId,
+          topic ? topic : '',
           description ? description : ''
         );
-      case 'dashed-scene':
+      case SimpleNodeTypeEnum.dashed_scene:
         return this.createDashedSceneElement(
           elementId,
+          topic ? topic : '',
           description ? description : ''
         );
-      case 'ubiquitous':
+      case SimpleNodeTypeEnum.ubiquitous_acess:
         return this.createUbiquitousElement(
-          'Ubiquitous - ' + this.elementsIdMap.get('ubiquitous')
+          SimpleNodeTypeEnum.ubiquitous_acess +
+            ' - ' +
+            this.elementsIdMap.get(SimpleNodeTypeEnum.ubiquitous_acess)
         );
-      case 'processing-box':
+      case SimpleNodeTypeEnum.system_process:
         return this.createProcessingBoxElement(
-          'Processing Box - ' + this.elementsIdMap.get('processing-box')
+          SimpleNodeTypeEnum.system_process +
+            ' - ' +
+            this.elementsIdMap.get(SimpleNodeTypeEnum.system_process)
         );
-      case 'start-point':
+      case SimpleNodeTypeEnum.start_node:
         return this.createStartPointElement(
-          'Start Point - ' + this.elementsIdMap.get('start-point')
+          SimpleNodeTypeEnum.start_node +
+            ' - ' +
+            this.elementsIdMap.get(SimpleNodeTypeEnum.start_node)
         );
-      case 'end-point':
+      case SimpleNodeTypeEnum.end_node:
         return this.createEndPointElement(
-          'End Point - ' + this.elementsIdMap.get('end-point')
+          SimpleNodeTypeEnum.end_node +
+            ' - ' +
+            this.elementsIdMap.get(SimpleNodeTypeEnum.end_node)
         );
     }
   }
 
+  // Updates elementType id.
   updateIdMapCount(elementType: string): void {
     const currentValue: number = this.elementsIdMap.get(elementType);
     this.elementsIdMap.set(elementType, currentValue + 1);
   }
+  // Return elements that can be connected by edges.
+  getConnectableElements(): any {
+    return this.canvas
+      .getObjects()
+      .filter(
+        (el) =>
+          el.type !== EdgeTypeEnum.dashed_edge && el.type !== EdgeTypeEnum.edge
+      );
+  }
 
+  // Connects two node elements.
   connectTwoElements(
+    elementId: string,
     originElementId: string,
     targetElementId: string,
     utterance: string
@@ -154,18 +193,21 @@ export class DiagramPanelComponent implements OnInit {
       return;
     }
 
+    // TODO: adicionar ID às arrows.
     switch (this.currentRenderingFigure) {
-      case 'dashed-arrow':
-        return this.createDashedArrowElement(origin, target, utterance);
-      case 'arrow':
-        return this.createArrowElement(origin, target, utterance);
+      case EdgeTypeEnum.dashed_edge:
+        return this.createDashedArrowElement(
+          elementId,
+          origin,
+          target,
+          utterance
+        );
+      case EdgeTypeEnum.edge:
+        return this.createArrowElement(elementId, origin, target, utterance);
     }
   }
 
   getArrowCoords(originElement, targetElement): number[] {
-    console.log('originElement', originElement);
-    console.log('targetElement', targetElement);
-
     // Find Arrow Start Point Coords
     const originTrY = originElement.aCoords.tr.y;
     const originBrY = originElement.aCoords.br.y;
@@ -191,7 +233,9 @@ export class DiagramPanelComponent implements OnInit {
     return [arrowStartX, arrowStartY, arrowEndX, arrowEndY];
   }
 
+  // Creates simple edge element.
   createArrowElement(
+    identifier: string,
     originElement,
     targetElement,
     utterance: string
@@ -223,11 +267,18 @@ export class DiagramPanelComponent implements OnInit {
           hasRotatingPoint: true,
         }),
       ],
-      { hasBorders: false, hasControls: false }
+      {
+        id: identifier,
+        type: EdgeTypeEnum.edge,
+        hasBorders: false,
+        hasControls: false,
+      }
     );
   }
 
+  // Creates dashed edge element.
   createDashedArrowElement(
+    identifier: string,
     originElement,
     targetElement,
     utterance: string
@@ -260,11 +311,21 @@ export class DiagramPanelComponent implements OnInit {
           hasRotatingPoint: true,
         }),
       ],
-      { hasBorders: false, hasControls: false }
+      {
+        id: identifier,
+        type: EdgeTypeEnum.dashed_edge,
+        hasBorders: false,
+        hasControls: false,
+      }
     );
   }
 
-  createSceneElement(sceneName: string, dialogs: string): fabric.Group {
+  // Creates simple scene element.
+  createSceneElement(
+    identifier: string,
+    sceneName: string,
+    dialogs: string
+  ): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Rect({
@@ -310,11 +371,22 @@ export class DiagramPanelComponent implements OnInit {
           hasRotatingPoint: true,
         }),
       ],
-      { id: sceneName, hasBorders: false, hasControls: false }
+      {
+        id: SimpleNodeTypeEnum.scene + ' - ' + identifier,
+        type: SimpleNodeTypeEnum.scene,
+        viewName: sceneName,
+        hasBorders: false,
+        hasControls: false,
+      }
     );
   }
 
-  createDashedSceneElement(sceneName: string, dialogs: string): fabric.Group {
+  // Creates dashed scene element.
+  createDashedSceneElement(
+    identifier: string,
+    sceneName: string,
+    dialogs: string
+  ): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Rect({
@@ -361,10 +433,17 @@ export class DiagramPanelComponent implements OnInit {
           hasRotatingPoint: true,
         }),
       ],
-      { id: sceneName, hasBorders: false, hasControls: false }
+      {
+        id: SimpleNodeTypeEnum.dashed_scene + ' - ' + identifier,
+        type: SimpleNodeTypeEnum.dashed_scene,
+        viewName: sceneName,
+        hasBorders: false,
+        hasControls: false,
+      }
     );
   }
 
+  // Creates end point element.
   createEndPointElement(identifier: string): fabric.Group {
     return new fabric.Group(
       [
@@ -383,13 +462,20 @@ export class DiagramPanelComponent implements OnInit {
           fill: '#000',
         }),
       ],
-      { id: identifier, hasBorders: false, hasControls: false }
+      {
+        id: identifier,
+        type: SimpleNodeTypeEnum.end_node,
+        hasBorders: false,
+        hasControls: false,
+      }
     );
   }
 
+  // Creates start point element.
   createStartPointElement(identifier: string): fabric.Circle {
     return new fabric.Circle({
       id: identifier,
+      type: SimpleNodeTypeEnum.start_node,
       radius: 15,
       left: 10,
       top: 10,
@@ -399,9 +485,11 @@ export class DiagramPanelComponent implements OnInit {
     });
   }
 
+  // Creates system process element.
   createProcessingBoxElement(identifier: string): fabric.Rect {
     return new fabric.Rect({
       id: identifier,
+      type: SimpleNodeTypeEnum.system_process,
       width: 30,
       height: 30,
       left: 10,
@@ -413,9 +501,11 @@ export class DiagramPanelComponent implements OnInit {
     });
   }
 
+  // Creates ubiquitous element.
   createUbiquitousElement(identifier: string): fabric.Rect {
     return new fabric.Rect({
       id: identifier,
+      type: SimpleNodeTypeEnum.ubiquitous_acess,
       radius: 2,
       width: 100,
       height: 35,
@@ -439,6 +529,7 @@ export class DiagramPanelComponent implements OnInit {
     }
   }
 
+  // Renders scene type elements and adds it to canvas.
   createSceneWithAdditionalProperties(formData): void {
     const topicKey = 'topic';
     const dialogsKey = 'dialogs';
@@ -449,9 +540,13 @@ export class DiagramPanelComponent implements OnInit {
     // create element
     this.viewScreen = 'elementsPanel';
     this.additionalPropertiesFormGroup.reset();
-    this.addElementToCanvas(this.renderElement(topic, dialogs));
+
+    this.addElementToCanvas(
+      this.renderElement(this.getCurrentRenderingFigureId(), topic, dialogs)
+    );
   }
 
+  // Renders edge type elements and adds it to canvas.
   createTransitionalElement(formData): void {
     const sourceKey = 'source';
     const targetKey = 'target';
@@ -463,16 +558,32 @@ export class DiagramPanelComponent implements OnInit {
 
     this.viewScreen = 'elementsPanel';
     this.transitionalPropertiesFormGroup.reset();
-    this.addElementToCanvas(this.connectTwoElements(source, target, utterance));
+
+    this.addElementToCanvas(
+      this.connectTwoElements(
+        this.getCurrentRenderingFigureId(),
+        source,
+        target,
+        utterance
+      )
+    );
   }
 
+  // Renders non-edge and non-scene element and adds it to canvas.
   createSimpleElement(): void {
-    const elementId = this.elementsIdMap.get(this.currentRenderingFigure);
-
-    this.updateIdMapCount(this.currentRenderingFigure);
-    this.addElementToCanvas(this.renderElement(elementId.toString()));
+    this.addElementToCanvas(
+      this.renderElement(this.getCurrentRenderingFigureId())
+    );
   }
 
+  // Returns current id for the current rendering figure type.
+  getCurrentRenderingFigureId(): string {
+    const elementId = this.elementsIdMap.get(this.currentRenderingFigure);
+    this.updateIdMapCount(this.currentRenderingFigure);
+    return elementId.toString();
+  }
+
+  // Adds an element to canvas and select it.
   addElementToCanvas(newElement: any): void {
     if (newElement) {
       this.canvas.add(newElement);

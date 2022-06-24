@@ -1,4 +1,4 @@
-export enum EdgeType {
-  EDGE = 'Edge',
-  DASHED_EDGE = 'Dashed Edge',
+export enum EdgeTypeEnum {
+  edge = 'Edge',
+  dashed_edge = 'Dashed Edge',
 }

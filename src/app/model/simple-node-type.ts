@@ -1,8 +1,8 @@
-export enum SimpleNodeType {
-  SCENE = 'Scene',
-  DASHED_SCENE = 'Dashed Scene',
-  START_NODE = 'Start Node',
-  END_NODE = 'End Node',
-  UBIQUITOUS_ACCSS = 'Ubiquitous Acess',
-  SYSTEM_PROCESS = 'System Process',
+export enum SimpleNodeTypeEnum {
+  scene = 'Scene',
+  dashed_scene = 'Dashed Scene',
+  start_node = 'Start Node',
+  end_node = 'End Node',
+  ubiquitous_acess = 'Ubiquitous Acess',
+  system_process = 'System Process',
 }

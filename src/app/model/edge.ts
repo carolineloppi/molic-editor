@@ -1,9 +1,9 @@
-import { EdgeType } from './edge-type';
+import { EdgeTypeEnum } from './edge-type';
 
 export class Edge {
   id: number;
   originNodeId: number;
   targetNodeId: number;
-  edgeType: EdgeType;
+  edgeType: EdgeTypeEnum;
   utterance: string;
 }
