@@ -1,12 +1,10 @@
-import { NodeType } from './node-type';
+import { SimpleNodeType } from './simple-node-type';
 
 export class Node {
   id: number;
   positionX: number;
   positionY: number;
-  sourceNodesId: number[];
-  targetNodesId: number[];
-  typeOfNode: NodeType;
+  typeOfNode: SimpleNodeType;
 
   //repositionOnCanvas(newPositionX, newPositionY): boolean {}
 }

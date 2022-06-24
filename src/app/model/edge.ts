@@ -1,9 +1,9 @@
-import { NodeType } from './node-type';
+import { EdgeType } from './edge-type';
 
 export class Edge {
-  originNodeId: string;
-  originNodeType: NodeType;
-  targetNodeId: string;
-  targetNodeType: NodeType;
-  edgeType: NodeType; // TODO: restringit para simpleNodeType vs EdgeType?
+  id: number;
+  originNodeId: number;
+  targetNodeId: number;
+  edgeType: EdgeType;
+  utterance: string;
 }

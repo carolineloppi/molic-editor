@@ -1,6 +1,4 @@
-export enum NodeType {
-  EDGE = 'Edge',
-  DASHED_EDGE = 'Dashed Edge',
+export enum SimpleNodeType {
   SCENE = 'Scene',
   DASHED_SCENE = 'Dashed Scene',
   START_NODE = 'Start Node',

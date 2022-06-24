@@ -1,5 +1,5 @@
 import { Edge } from './edge';
-import { NodeType } from './node-type';
+
 export class Diagram {
   nodes: Node[];
   edges: Edge[];
