@@ -28,6 +28,8 @@ export class DiagramPanelComponent implements OnInit {
   // Active figure under construction.
   currentRenderingFigure: any;
 
+  currentArrowType: any;
+
   // Canvas default size.
   private size: any = {
     width: 1200,
@@ -76,7 +78,7 @@ export class DiagramPanelComponent implements OnInit {
       'center';
 
     //test with up //run with move
-    this.canvas.on('mouse:up', (e) => {
+    this.canvas.on('mouse:move', (e) => {
       if (!this.canvas.getActiveObject() || e.target == null) {
         return;
       }
@@ -111,11 +113,21 @@ export class DiagramPanelComponent implements OnInit {
 
           if (movingElement.oCoords.ml.x < anchoredElement.oCoords.ml.x) {
             line.set({ x1: movingElement.left, y1: movingElement.top });
-            line.set({ x2: anchoredElement.left, y2: anchoredElement.top });
+            line.set({
+              x2: anchoredElement.left,
+              y2: anchoredElement.top,
+            });
           } else {
-            line.set({ x2: movingElement.left, y2: movingElement.top });
-            line.set({ x1: anchoredElement.left, y1: anchoredElement.top });
+            line.set({
+              x2: movingElement.left,
+              y2: movingElement.top,
+            });
+            line.set({
+              x1: anchoredElement.left,
+              y1: anchoredElement.top,
+            });
           }
+          this.canvas.sendToBack(line);
         }
       });
 
@@ -135,8 +147,13 @@ export class DiagramPanelComponent implements OnInit {
 
     switch (figure) {
       case EdgeTypeEnum.edge:
+        this.viewScreen = 'transitionPropertiesPanel';
+        this.currentArrowType = EdgeTypeEnum.edge;
+        break;
       case EdgeTypeEnum.dashed_edge:
         this.viewScreen = 'transitionPropertiesPanel';
+        this.currentArrowType = EdgeTypeEnum.dashed_edge;
+
         break;
 
       case SimpleNodeTypeEnum.scene:
@@ -213,6 +230,7 @@ export class DiagramPanelComponent implements OnInit {
       );
   }
 
+  //TODO: filtrar a lista e descobrir motivo da duplicidade.
   // Connects two node elements.
   connectTwoElements(
     elementId: string,
@@ -339,6 +357,7 @@ export class DiagramPanelComponent implements OnInit {
 
     // console.log('originElement.line1', originElement.line1);
     //console.log('targetElement.line1', targetElement.line1);
+    this.canvas.sendToBack(arrow);
 
     return arrow;
   }
@@ -352,14 +371,14 @@ export class DiagramPanelComponent implements OnInit {
     utterance: string
   ): fabric.Group {
     const coords = this.getArrowCoords(originElement, targetElement);
-    return new fabric.Group(
-      [
-        new fabric.Line(coords, {
-          stroke: '#908C8C',
-          strokeWidth: 1.5,
-          strokeDashArray: [3, 3],
-        }),
-        new fabric.Triangle({
+    //return new fabric.Group(
+    // [
+    var dashed_arrow = new fabric.Line(coords, {
+      stroke: '#908C8C',
+      strokeWidth: 1.5,
+      strokeDashArray: [3, 3],
+    });
+    /* new fabric.Triangle({
           width: 10,
           height: 15,
           fill: '#908C8C',
@@ -378,14 +397,24 @@ export class DiagramPanelComponent implements OnInit {
           fontSize: 30,
           hasRotatingPoint: true,
         }),
-      ],
-      {
-        id: identifier,
-        type: EdgeTypeEnum.dashed_edge,
-        hasBorders: false,
-        hasControls: false,
-      }
-    );
+      ],*/
+
+    dashed_arrow.id = identifier;
+    dashed_arrow.type = EdgeTypeEnum.dashed_edge;
+    dashed_arrow.hasBorders = false;
+    dashed_arrow.hasControls = false;
+    dashed_arrow.originElement = originElement;
+    dashed_arrow.targetElement = targetElement;
+    dashed_arrow.selectable = false;
+    dashed_arrow.evented = false;
+
+    originElement.line1.push(dashed_arrow);
+    targetElement.line1.push(dashed_arrow);
+
+    this.canvas.sendToBack(dashed_arrow);
+
+    return dashed_arrow;
+    //);
   }
 
   // Creates simple scene element.
@@ -562,7 +591,7 @@ export class DiagramPanelComponent implements OnInit {
 
   // Creates system process element.
   createProcessingBoxElement(identifier: string): fabric.Rect {
-    return new fabric.Rect({
+    var systemProcess = new fabric.Rect({
       id: identifier,
       type: SimpleNodeTypeEnum.system_process,
       width: 30,
@@ -575,11 +604,14 @@ export class DiagramPanelComponent implements OnInit {
       hasBorders: false,
       line1: [],
     });
+
+    this.canvas.bringToFront(systemProcess);
+    return systemProcess;
   }
 
   // Creates ubiquitous element.
   createUbiquitousElement(identifier: string): fabric.Rect {
-    return new fabric.Rect({
+    var ubiquitous = new fabric.Rect({
       id: identifier,
       type: SimpleNodeTypeEnum.ubiquitous_acess,
       radius: 2,
@@ -597,6 +629,9 @@ export class DiagramPanelComponent implements OnInit {
       hasBorders: false,
       line1: [],
     });
+
+    this.canvas.bringToFront(ubiquitous);
+    return ubiquitous;
   }
 
   // Remove all elements from Canvas.
@@ -673,14 +708,21 @@ export class DiagramPanelComponent implements OnInit {
     switch (elementType) {
       case 'additionalProperties':
         this.additionalPropertiesFormGroup.reset();
+        this.canvas.remove(this.canvas.getActiveObject());
         break;
 
       case 'transitionalProperties':
         this.transitionalPropertiesFormGroup.reset();
+        let arrowUnderConstruction = this.canvas
+          .getObjects()
+          .filter(
+            (el) => el.id === this.elementsIdMap.get(this.currentArrowType)
+          )[0];
+
+        this.canvas.remove(arrowUnderConstruction);
         break;
     }
 
-    this.canvas.remove(this.canvas.getActiveObject());
     this.viewScreen = 'elementsPanel';
   }
 }
