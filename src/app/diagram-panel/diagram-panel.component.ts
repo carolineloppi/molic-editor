@@ -10,6 +10,8 @@ import { fabric } from 'fabric';
   templateUrl: './diagram-panel.component.html',
   styleUrls: ['./diagram-panel.component.css'],
 })
+
+//TODO: Adicionar o objeto linha aos outros elementos. Transforar tudo para array de linhas.
 export class DiagramPanelComponent implements OnInit {
   private canvas: any;
 
@@ -61,7 +63,6 @@ export class DiagramPanelComponent implements OnInit {
     this.elementsIdMap.set(SimpleNodeTypeEnum.scene, 0);
     this.elementsIdMap.set(SimpleNodeTypeEnum.dashed_scene, 0);
   }
-
   ngOnInit(): void {
     this.canvas = new fabric.Canvas('canvas', {
       hoverCursor: 'pointer',
@@ -71,6 +72,55 @@ export class DiagramPanelComponent implements OnInit {
     this.canvas.setWidth(this.size.width);
     this.canvas.setHeight(this.size.height);
     this.viewScreen = 'elementsPanel';
+    fabric.Object.prototype.originX = fabric.Object.prototype.originY =
+      'center';
+
+    //test with up //run with move
+    this.canvas.on('mouse:up', (e) => {
+      if (!this.canvas.getActiveObject() || e.target == null) {
+        return;
+      }
+
+      if (e.target != this.canvas.getActiveObject()) {
+        return;
+      }
+      var p = e.target;
+      if (!p.line1 || p.line1.length == 0) {
+        return;
+      }
+
+      p.line1.forEach((line) => {
+        if (!line) {
+          return;
+        }
+
+        let originXPosition = line.originElement.oCoords.ml.x;
+        let targetXPosition = line.targetElement.oCoords.ml.x;
+
+        if (line) {
+          let movingElement;
+          let anchoredElement;
+
+          if (e.target == line.originElement) {
+            movingElement = line.originElement;
+            anchoredElement = line.targetElement;
+          } else {
+            movingElement = line.targetElement;
+            anchoredElement = line.originElement;
+          }
+
+          if (movingElement.oCoords.ml.x < anchoredElement.oCoords.ml.x) {
+            line.set({ x1: movingElement.left, y1: movingElement.top });
+            line.set({ x2: anchoredElement.left, y2: anchoredElement.top });
+          } else {
+            line.set({ x2: movingElement.left, y2: movingElement.top });
+            line.set({ x1: anchoredElement.left, y1: anchoredElement.top });
+          }
+        }
+      });
+
+      this.canvas.renderAll();
+    });
   }
 
   // Selects the object on Canvas.
@@ -99,7 +149,7 @@ export class DiagramPanelComponent implements OnInit {
         return;
     }
 
-    // TODO: criar node e edge e adicionar aos arrays do diagram.ts
+    // TODO: criar node e edge e adicionar aos arrays do diagram.ts representando o modelo para gerar xml
   }
 
   // Calls the canvas rendering functions for each non-edge element
@@ -193,7 +243,6 @@ export class DiagramPanelComponent implements OnInit {
       return;
     }
 
-    // TODO: adicionar ID às arrows.
     switch (this.currentRenderingFigure) {
       case EdgeTypeEnum.dashed_edge:
         return this.createDashedArrowElement(
@@ -224,15 +273,16 @@ export class DiagramPanelComponent implements OnInit {
     const arrowEndX = targetTlX;
     const arrowEndY = targetTlY + (targetBlY - targetTlY) / 2;
 
-    console.log('Start Arrow X: ', arrowStartX);
-    console.log('Start Arrow Y: ', arrowStartY);
+    // console.log('Start Arrow X: ', arrowStartX);
+    //console.log('Start Arrow Y: ', arrowStartY);
 
-    console.log('End Arrow X: ', arrowEndX);
-    console.log('End Arrow Y: ', arrowEndY);
+    //console.log('End Arrow X: ', arrowEndX);
+    //console.log('End Arrow Y: ', arrowEndY);
 
     return [arrowStartX, arrowStartY, arrowEndX, arrowEndY];
   }
 
+  // TODO: alterar de volta para seta.
   // Creates simple edge element.
   createArrowElement(
     identifier: string,
@@ -241,13 +291,13 @@ export class DiagramPanelComponent implements OnInit {
     utterance: string
   ): fabric.Group {
     const coords = this.getArrowCoords(originElement, targetElement);
-    return new fabric.Group(
-      [
-        new fabric.Line(coords, {
-          stroke: '#908C8C',
-          strokeWidth: 1.5,
-        }),
-        new fabric.Triangle({
+    // var arrowGroup = new fabric.Group(
+    //[
+    var arrow = new fabric.Line(coords, {
+      stroke: '#908C8C',
+      strokeWidth: 1.5,
+    });
+    /* new fabric.Triangle({
           width: 10,
           height: 15,
           fill: '#908C8C',
@@ -265,17 +315,35 @@ export class DiagramPanelComponent implements OnInit {
           scaleY: 0.5,
           fontSize: 30,
           hasRotatingPoint: true,
-        }),
-      ],
-      {
+        }),*/
+    // ],
+    /* {
         id: identifier,
         type: EdgeTypeEnum.edge,
         hasBorders: false,
         hasControls: false,
-      }
-    );
+      };*/
+    //);
+
+    arrow.id = identifier;
+    arrow.type = EdgeTypeEnum.edge;
+    arrow.hasBorders = false;
+    arrow.hasControls = false;
+    arrow.originElement = originElement;
+    arrow.targetElement = targetElement;
+    arrow.selectable = false;
+    arrow.evented = false;
+
+    originElement.line1.push(arrow);
+    targetElement.line1.push(arrow);
+
+    // console.log('originElement.line1', originElement.line1);
+    //console.log('targetElement.line1', targetElement.line1);
+
+    return arrow;
   }
 
+  // TODO: propagar mudanças do arrow simples para cá.
   // Creates dashed edge element.
   createDashedArrowElement(
     identifier: string,
@@ -359,6 +427,9 @@ export class DiagramPanelComponent implements OnInit {
           fontSize: 30,
           hasRotatingPoint: true,
         }),
+        // TODO: começar no espaço mais a esquerda e cortar em um limite de letras.
+        // colocar o diálogo e topics como hint.
+        //Colocar como hint o id de todos os elementos.
         new fabric.IText(dialogs, {
           left: 38,
           top: 34,
@@ -377,6 +448,7 @@ export class DiagramPanelComponent implements OnInit {
         viewName: sceneName,
         hasBorders: false,
         hasControls: false,
+        line1: [],
       }
     );
   }
@@ -439,6 +511,7 @@ export class DiagramPanelComponent implements OnInit {
         viewName: sceneName,
         hasBorders: false,
         hasControls: false,
+        line1: [],
       }
     );
   }
@@ -467,6 +540,7 @@ export class DiagramPanelComponent implements OnInit {
         type: SimpleNodeTypeEnum.end_node,
         hasBorders: false,
         hasControls: false,
+        line1: [],
       }
     );
   }
@@ -482,6 +556,7 @@ export class DiagramPanelComponent implements OnInit {
       fill: '#000',
       hasControls: false,
       hasBorders: false,
+      line1: [],
     });
   }
 
@@ -498,6 +573,7 @@ export class DiagramPanelComponent implements OnInit {
       fill: '#000',
       hasControls: false,
       hasBorders: false,
+      line1: [],
     });
   }
 
@@ -519,6 +595,7 @@ export class DiagramPanelComponent implements OnInit {
       strokeWidth: 1.5,
       hasControls: false,
       hasBorders: false,
+      line1: [],
     });
   }
 
