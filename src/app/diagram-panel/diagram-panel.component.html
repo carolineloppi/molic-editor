@@ -1,6 +1,6 @@
 <div class="row no-gutters">
   <div class="col-2">
-    <div *ngIf="viewScreen == 'elementsPanel'">
+    <div *ngIf="viewScreen == 'elementsPanel'" class="elements-panel">
       <table>
           <tr><td style="border-top: none;"><img class="width-smaller cursor-copy" src="../../assets/elements/start-point.png" (click)="createElement(SimpleNodeType.start_node)"/></td></tr>
           <tr><td><img class="width-small cursor-copy" src="../../assets/elements/end-point.png" (click)="createElement(SimpleNodeType.end_node)"></td></tr>

@@ -11,7 +11,7 @@ import { fabric } from 'fabric';
   styleUrls: ['./diagram-panel.component.css'],
 })
 
-//TODO: Adicionar o objeto linha aos outros elementos. Transforar tudo para array de linhas.
+// TODO: Adicionar o objeto linha aos outros elementos. Transforar tudo para array de linhas.
 export class DiagramPanelComponent implements OnInit {
   private canvas: any;
 
@@ -32,7 +32,7 @@ export class DiagramPanelComponent implements OnInit {
 
   // Canvas default size.
   private size: any = {
-    width: 1200,
+    width: window.innerWidth,
     height: 1000,
   };
 
@@ -77,17 +77,17 @@ export class DiagramPanelComponent implements OnInit {
     fabric.Object.prototype.originX = fabric.Object.prototype.originY =
       'center';
 
-    //test with up //run with move
+    // DEV_NOTE: test with mouse: up and run with mouse:move
     this.canvas.on('mouse:move', (e) => {
       if (!this.canvas.getActiveObject() || e.target == null) {
         return;
       }
 
-      if (e.target != this.canvas.getActiveObject()) {
+      if (e.target !== this.canvas.getActiveObject()) {
         return;
       }
-      var p = e.target;
-      if (!p.line1 || p.line1.length == 0) {
+      const p = e.target;
+      if (!p.line1 || p.line1.length === 0) {
         return;
       }
 
@@ -96,14 +96,14 @@ export class DiagramPanelComponent implements OnInit {
           return;
         }
 
-        let originXPosition = line.originElement.oCoords.ml.x;
-        let targetXPosition = line.targetElement.oCoords.ml.x;
+        const originXPosition = line.originElement.oCoords.ml.x;
+        const targetXPosition = line.targetElement.oCoords.ml.x;
 
         if (line) {
           let movingElement;
           let anchoredElement;
 
-          if (e.target == line.originElement) {
+          if (e.target === line.originElement) {
             movingElement = line.originElement;
             anchoredElement = line.targetElement;
           } else {
@@ -220,6 +220,7 @@ export class DiagramPanelComponent implements OnInit {
     const currentValue: number = this.elementsIdMap.get(elementType);
     this.elementsIdMap.set(elementType, currentValue + 1);
   }
+
   // Return elements that can be connected by edges.
   getConnectableElements(): any {
     return this.canvas
@@ -230,7 +231,7 @@ export class DiagramPanelComponent implements OnInit {
       );
   }
 
-  //TODO: filtrar a lista e descobrir motivo da duplicidade.
+  // TODO: filtrar a lista e descobrir motivo da duplicidade.
   // Connects two node elements.
   connectTwoElements(
     elementId: string,
@@ -291,12 +292,6 @@ export class DiagramPanelComponent implements OnInit {
     const arrowEndX = targetTlX;
     const arrowEndY = targetTlY + (targetBlY - targetTlY) / 2;
 
-    // console.log('Start Arrow X: ', arrowStartX);
-    //console.log('Start Arrow Y: ', arrowStartY);
-
-    //console.log('End Arrow X: ', arrowEndX);
-    //console.log('End Arrow Y: ', arrowEndY);
-
     return [arrowStartX, arrowStartY, arrowEndX, arrowEndY];
   }
 
@@ -310,8 +305,8 @@ export class DiagramPanelComponent implements OnInit {
   ): fabric.Group {
     const coords = this.getArrowCoords(originElement, targetElement);
     // var arrowGroup = new fabric.Group(
-    //[
-    var arrow = new fabric.Line(coords, {
+    // [
+    const arrow = new fabric.Line(coords, {
       stroke: '#908C8C',
       strokeWidth: 1.5,
     });
@@ -341,7 +336,7 @@ export class DiagramPanelComponent implements OnInit {
         hasBorders: false,
         hasControls: false,
       };*/
-    //);
+    // );
 
     arrow.id = identifier;
     arrow.type = EdgeTypeEnum.edge;
@@ -355,8 +350,6 @@ export class DiagramPanelComponent implements OnInit {
     originElement.line1.push(arrow);
     targetElement.line1.push(arrow);
 
-    // console.log('originElement.line1', originElement.line1);
-    //console.log('targetElement.line1', targetElement.line1);
     this.canvas.sendToBack(arrow);
 
     return arrow;
@@ -371,9 +364,9 @@ export class DiagramPanelComponent implements OnInit {
     utterance: string
   ): fabric.Group {
     const coords = this.getArrowCoords(originElement, targetElement);
-    //return new fabric.Group(
+    // return new fabric.Group(
     // [
-    var dashed_arrow = new fabric.Line(coords, {
+    const dashedArrow = new fabric.Line(coords, {
       stroke: '#908C8C',
       strokeWidth: 1.5,
       strokeDashArray: [3, 3],
@@ -399,22 +392,22 @@ export class DiagramPanelComponent implements OnInit {
         }),
       ],*/
 
-    dashed_arrow.id = identifier;
-    dashed_arrow.type = EdgeTypeEnum.dashed_edge;
-    dashed_arrow.hasBorders = false;
-    dashed_arrow.hasControls = false;
-    dashed_arrow.originElement = originElement;
-    dashed_arrow.targetElement = targetElement;
-    dashed_arrow.selectable = false;
-    dashed_arrow.evented = false;
+    dashedArrow.id = identifier;
+    dashedArrow.type = EdgeTypeEnum.dashed_edge;
+    dashedArrow.hasBorders = false;
+    dashedArrow.hasControls = false;
+    dashedArrow.originElement = originElement;
+    dashedArrow.targetElement = targetElement;
+    dashedArrow.selectable = false;
+    dashedArrow.evented = false;
 
-    originElement.line1.push(dashed_arrow);
-    targetElement.line1.push(dashed_arrow);
+    originElement.line1.push(dashedArrow);
+    targetElement.line1.push(dashedArrow);
 
-    this.canvas.sendToBack(dashed_arrow);
+    this.canvas.sendToBack(dashedArrow);
 
-    return dashed_arrow;
-    //);
+    return dashedArrow;
+    // );
   }
 
   // Creates simple scene element.
@@ -423,14 +416,22 @@ export class DiagramPanelComponent implements OnInit {
     sceneName: string,
     dialogs: string
   ): fabric.Group {
+    // TODO: propagar para dashed-scene.
+    // TODO: quebrar linha ou ajustar para caber d+u e tooltip com hover
+    const sceneNameWidth = this.canvas
+      .getContext('2d')
+      .measureText(sceneName).width;
+
+    const sceneWidth = sceneNameWidth > 150 ? sceneNameWidth : 150;
+
     return new fabric.Group(
       [
         new fabric.Rect({
           radius: 2,
-          width: 100,
-          height: 70,
-          left: 10,
-          top: 10,
+          width: sceneWidth,
+          height: 100,
+          left: 120,
+          top: 60,
           angle: 0,
           fill: '#fff',
           rx: 8,
@@ -440,14 +441,10 @@ export class DiagramPanelComponent implements OnInit {
           hasControls: false,
           hasBorders: false,
         }),
-        new fabric.Line([50, 200, 148.5, 200], {
-          left: 11.5,
-          top: 30,
-          stroke: '#908C8C',
-        }),
+
         new fabric.IText(sceneName, {
-          left: 38,
-          top: 14,
+          left: 50,
+          top: 20,
           fontFamily: 'helvetica',
           angle: 0,
           fill: '#000000',
@@ -455,13 +452,21 @@ export class DiagramPanelComponent implements OnInit {
           scaleY: 0.5,
           fontSize: 30,
           hasRotatingPoint: true,
+          originX: 'left',
+          originY: 'top',
+        }),
+
+        new fabric.Line([0, 200, 148.5, 200], {
+          left: 120,
+          top: 40,
+          stroke: '#908C8C',
         }),
         // TODO: começar no espaço mais a esquerda e cortar em um limite de letras.
         // colocar o diálogo e topics como hint.
-        //Colocar como hint o id de todos os elementos.
+        // Colocar como hint o id de todos os elementos.
         new fabric.IText(dialogs, {
-          left: 38,
-          top: 34,
+          left: 50,
+          top: 60,
           fontFamily: 'helvetica',
           angle: 0,
           fill: '#000000',
@@ -469,6 +474,8 @@ export class DiagramPanelComponent implements OnInit {
           scaleY: 0.5,
           fontSize: 30,
           hasRotatingPoint: true,
+          originX: 'left',
+          originY: 'top',
         }),
       ],
       {
@@ -506,8 +513,8 @@ export class DiagramPanelComponent implements OnInit {
           hasBorders: false,
         }),
         new fabric.Line([50, 200, 148.5, 200], {
-          left: 11.5,
-          top: 30,
+          left: 11,
+          top: 3,
           stroke: '#908C8C',
           strokeDashArray: [5, 5],
         }),
@@ -524,7 +531,7 @@ export class DiagramPanelComponent implements OnInit {
         }),
         new fabric.IText(dialogs, {
           left: 38,
-          top: 34,
+          top: 4,
           fontFamily: 'helvetica',
           angle: 0,
           fill: '#000000',
@@ -551,10 +558,10 @@ export class DiagramPanelComponent implements OnInit {
       [
         new fabric.Circle({
           radius: 15,
-          left: 10,
+          left: 15.5,
           stroke: 'black',
           strokeWidth: 2,
-          top: 10,
+          top: 15.5,
           fill: '#fff',
         }),
         new fabric.Circle({
@@ -580,8 +587,8 @@ export class DiagramPanelComponent implements OnInit {
       id: identifier,
       type: SimpleNodeTypeEnum.start_node,
       radius: 15,
-      left: 10,
-      top: 10,
+      left: 120,
+      top: 60,
       fill: '#000',
       hasControls: false,
       hasBorders: false,
@@ -591,7 +598,7 @@ export class DiagramPanelComponent implements OnInit {
 
   // Creates system process element.
   createProcessingBoxElement(identifier: string): fabric.Rect {
-    var systemProcess = new fabric.Rect({
+    const systemProcess = new fabric.Rect({
       id: identifier,
       type: SimpleNodeTypeEnum.system_process,
       width: 30,
@@ -611,7 +618,7 @@ export class DiagramPanelComponent implements OnInit {
 
   // Creates ubiquitous element.
   createUbiquitousElement(identifier: string): fabric.Rect {
-    var ubiquitous = new fabric.Rect({
+    const ubiquitous = new fabric.Rect({
       id: identifier,
       type: SimpleNodeTypeEnum.ubiquitous_acess,
       radius: 2,
@@ -713,7 +720,7 @@ export class DiagramPanelComponent implements OnInit {
 
       case 'transitionalProperties':
         this.transitionalPropertiesFormGroup.reset();
-        let arrowUnderConstruction = this.canvas
+        const arrowUnderConstruction = this.canvas
           .getObjects()
           .filter(
             (el) => el.id === this.elementsIdMap.get(this.currentArrowType)

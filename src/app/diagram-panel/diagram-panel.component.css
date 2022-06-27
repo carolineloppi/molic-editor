@@ -9,6 +9,11 @@
   background-color: rgba(128, 128, 128, 0.144);
   height: calc(100vh - 80px);
   width: 100%;
+  z-index: -1
+}
+
+.elements-panel{
+  z-index: -1
 }
 
 .properties-title{

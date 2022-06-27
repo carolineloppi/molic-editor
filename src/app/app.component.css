@@ -4,6 +4,7 @@ header{
     height: 80px;
     background-color: rgba(128, 128, 128, 0.246);
     border-bottom: 1px solid rgba(128, 128, 128, 0.246);
+    min-width: 712px;
 }
 
 .nav {
