@@ -11,7 +11,7 @@ import { fabric } from 'fabric';
   styleUrls: ['./diagram-panel.component.css'],
 })
 
-// TODO: Adicionar o objeto linha aos outros elementos. Transforar tudo para array de linhas.
+// TODO: permitir deleção de item
 export class DiagramPanelComponent implements OnInit {
   private canvas: any;
 
@@ -87,11 +87,11 @@ export class DiagramPanelComponent implements OnInit {
         return;
       }
       const p = e.target;
-      if (!p.line1 || p.line1.length === 0) {
+      if (!p.lines || p.lines.length === 0) {
         return;
       }
 
-      p.line1.forEach((line) => {
+      p.lines.forEach((line) => {
         if (!line) {
           return;
         }
@@ -231,7 +231,7 @@ export class DiagramPanelComponent implements OnInit {
       );
   }
 
-  // TODO: filtrar a lista e descobrir motivo da duplicidade.
+  // TODO: filtrar a lista e descobrir motivo da duplicidade. Parece ser só com o Ubíquo e System.
   // Connects two node elements.
   connectTwoElements(
     elementId: string,
@@ -347,8 +347,8 @@ export class DiagramPanelComponent implements OnInit {
     arrow.selectable = false;
     arrow.evented = false;
 
-    originElement.line1.push(arrow);
-    targetElement.line1.push(arrow);
+    originElement.lines.push(arrow);
+    targetElement.lines.push(arrow);
 
     this.canvas.sendToBack(arrow);
 
@@ -401,8 +401,8 @@ export class DiagramPanelComponent implements OnInit {
     dashedArrow.selectable = false;
     dashedArrow.evented = false;
 
-    originElement.line1.push(dashedArrow);
-    targetElement.line1.push(dashedArrow);
+    originElement.lines.push(dashedArrow);
+    targetElement.lines.push(dashedArrow);
 
     this.canvas.sendToBack(dashedArrow);
 
@@ -484,7 +484,7 @@ export class DiagramPanelComponent implements OnInit {
         viewName: sceneName,
         hasBorders: false,
         hasControls: false,
-        line1: [],
+        lines: [],
       }
     );
   }
@@ -547,7 +547,7 @@ export class DiagramPanelComponent implements OnInit {
         viewName: sceneName,
         hasBorders: false,
         hasControls: false,
-        line1: [],
+        lines: [],
       }
     );
   }
@@ -576,7 +576,7 @@ export class DiagramPanelComponent implements OnInit {
         type: SimpleNodeTypeEnum.end_node,
         hasBorders: false,
         hasControls: false,
-        line1: [],
+        lines: [],
       }
     );
   }
@@ -592,7 +592,7 @@ export class DiagramPanelComponent implements OnInit {
       fill: '#000',
       hasControls: false,
       hasBorders: false,
-      line1: [],
+      lines: [],
     });
   }
 
@@ -609,7 +609,7 @@ export class DiagramPanelComponent implements OnInit {
       fill: '#000',
       hasControls: false,
       hasBorders: false,
-      line1: [],
+      lines: [],
     });
 
     this.canvas.bringToFront(systemProcess);
@@ -634,7 +634,7 @@ export class DiagramPanelComponent implements OnInit {
       strokeWidth: 1.5,
       hasControls: false,
       hasBorders: false,
-      line1: [],
+      lines: [],
     });
 
     this.canvas.bringToFront(ubiquitous);
