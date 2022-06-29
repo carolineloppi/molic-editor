@@ -55,7 +55,7 @@ export class DiagramPanelComponent implements OnInit {
       utterance: '',
     });
 
-    // TODO: atualizar ids iniciais ao carregar o XML.
+    // TODO VERSION2: update inicial Ids when loading XML project file.
     this.elementsIdMap.set(SimpleNodeTypeEnum.ubiquitous_acess, 0);
     this.elementsIdMap.set(SimpleNodeTypeEnum.system_process, 0);
     this.elementsIdMap.set(SimpleNodeTypeEnum.start_node, 0);
@@ -65,6 +65,7 @@ export class DiagramPanelComponent implements OnInit {
     this.elementsIdMap.set(SimpleNodeTypeEnum.scene, 0);
     this.elementsIdMap.set(SimpleNodeTypeEnum.dashed_scene, 0);
   }
+
   ngOnInit(): void {
     this.canvas = new fabric.Canvas('canvas', {
       hoverCursor: 'pointer',
@@ -127,12 +128,65 @@ export class DiagramPanelComponent implements OnInit {
               y1: anchoredElement.top,
             });
           }
-          this.canvas.sendToBack(line);
+
+          // Update triangle and utterance position relative to the connection line.
+          line.triangle.set({
+            left: line.getCenterPoint().x,
+            top: line.getCenterPoint().y,
+            angle: this.calcArrowAngle(
+              line.originElement.oCoords.ml.x,
+              line.originElement.oCoords.ml.y,
+              line.targetElement.oCoords.ml.x,
+              line.targetElement.oCoords.ml.y
+            ),
+          });
+
+          line.utteranceText.set({
+            left: line.getCenterPoint().x,
+            top: line.getCenterPoint().y - 20,
+          });
+
+          this.canvas.sendToBack(line.line);
         }
       });
 
       this.canvas.renderAll();
     });
+  }
+
+  /*
+  This calcArrowAngle function below (with a few adjusts) was provided in a StackOverflow answer and used here.
+  It servers the purpose of calculating the rotation of the connection's arrow when moving an element in the Canvas.
+  Full answer can be found here: https://stackoverflow.com/questions/42800110/fabric-js-arrows-and-arrow-head-rotating  */
+  calcArrowAngle(
+    originElementX: number,
+    originElementY: number,
+    targetElementX: number,
+    targetElementY: number
+  ): number {
+    let angle = 0;
+    const horizontalDiff = targetElementX - originElementX;
+    const verticalDiff = targetElementY - originElementY;
+
+    if (horizontalDiff === 0) {
+      angle =
+        verticalDiff === 0
+          ? 0
+          : verticalDiff > 0
+          ? Math.PI / 2
+          : (Math.PI * 3) / 2;
+    } else if (verticalDiff === 0) {
+      angle = horizontalDiff > 0 ? 0 : Math.PI;
+    } else {
+      angle =
+        horizontalDiff < 0
+          ? Math.atan(verticalDiff / horizontalDiff) + Math.PI
+          : verticalDiff < 0
+          ? Math.atan(verticalDiff / horizontalDiff) + 2 * Math.PI
+          : Math.atan(verticalDiff / horizontalDiff);
+    }
+
+    return (angle * 180) / Math.PI + 90;
   }
 
   // Selects the object on Canvas.
@@ -166,7 +220,7 @@ export class DiagramPanelComponent implements OnInit {
         return;
     }
 
-    // TODO: criar node e edge e adicionar aos arrays do diagram.ts representando o modelo para gerar xml
+    // TODO VERSION2: create nodes and edges and add to Diagram model class in order to generate the XML file
   }
 
   // Calls the canvas rendering functions for each non-edge element
@@ -238,7 +292,7 @@ export class DiagramPanelComponent implements OnInit {
     originElementId: string,
     targetElementId: string,
     utterance: string
-  ): fabric.Group {
+  ): fabric.any[] {
     if (this.canvas.getObjects().length < 2) {
       console.log('There are not enough elements to create a connection');
       return;
@@ -295,119 +349,111 @@ export class DiagramPanelComponent implements OnInit {
     return [arrowStartX, arrowStartY, arrowEndX, arrowEndY];
   }
 
-  // TODO: alterar de volta para seta.
   // Creates simple edge element.
   createArrowElement(
     identifier: string,
     originElement,
     targetElement,
     utterance: string
-  ): fabric.Group {
+  ): fabric.any[] {
     const coords = this.getArrowCoords(originElement, targetElement);
-    // var arrowGroup = new fabric.Group(
-    // [
-    const arrow = new fabric.Line(coords, {
+
+    const line = new fabric.Line(coords, {
       stroke: '#908C8C',
       strokeWidth: 1.5,
     });
-    /* new fabric.Triangle({
-          width: 10,
-          height: 15,
-          fill: '#908C8C',
-          left: coords[2] + 1,
-          top: coords[3] - 5,
-          angle: 90,
-        }),
-        new fabric.IText(utterance, {
-          left: coords[2] - 3,
-          top: coords[3] - 5,
-          fontFamily: 'helvetica',
-          angle: 0,
-          fill: '#000000',
-          scaleX: 0.5,
-          scaleY: 0.5,
-          fontSize: 30,
-          hasRotatingPoint: true,
-        }),*/
-    // ],
-    /* {
-        id: identifier,
-        type: EdgeTypeEnum.edge,
-        hasBorders: false,
-        hasControls: false,
-      };*/
-    // );
 
-    arrow.id = identifier;
-    arrow.type = EdgeTypeEnum.edge;
-    arrow.hasBorders = false;
-    arrow.hasControls = false;
-    arrow.originElement = originElement;
-    arrow.targetElement = targetElement;
-    arrow.selectable = false;
-    arrow.evented = false;
+    const triangle = new fabric.Triangle({
+      width: 15,
+      height: 20,
+      fill: '#908C8C',
+      left: line.getCenterPoint().x,
+      top: line.getCenterPoint().y,
+      angle: this.calcArrowAngle(coords[0], coords[1], coords[2], coords[3]),
+    });
 
-    originElement.lines.push(arrow);
-    targetElement.lines.push(arrow);
+    const utteranceText = new fabric.IText(utterance, {
+      left: line.getCenterPoint().x,
+      top: line.getCenterPoint().y - 20,
+      angle: 0,
+      fontFamily: 'helvetica',
+      fill: '#000000',
+      scaleX: 0.5,
+      scaleY: 0.5,
+      fontSize: 30,
+      hasRotatingPoint: true,
+    });
 
-    this.canvas.sendToBack(arrow);
+    line.id = identifier;
+    line.type = EdgeTypeEnum.edge;
+    line.hasBorders = false;
+    line.hasControls = false;
+    line.originElement = originElement;
+    line.targetElement = targetElement;
+    line.selectable = false;
+    line.evented = false;
 
-    return arrow;
+    line.triangle = triangle;
+    line.utteranceText = utteranceText;
+
+    originElement.lines.push(line);
+    targetElement.lines.push(line);
+
+    return [line, triangle, utteranceText];
   }
 
-  // TODO: propagar mudanças do arrow simples para cá.
   // Creates dashed edge element.
   createDashedArrowElement(
     identifier: string,
     originElement,
     targetElement,
     utterance: string
-  ): fabric.Group {
+  ): fabric.any[] {
     const coords = this.getArrowCoords(originElement, targetElement);
-    // return new fabric.Group(
-    // [
-    const dashedArrow = new fabric.Line(coords, {
+
+    const dashedLine = new fabric.Line(coords, {
       stroke: '#908C8C',
       strokeWidth: 1.5,
       strokeDashArray: [3, 3],
     });
-    /* new fabric.Triangle({
-          width: 10,
-          height: 15,
-          fill: '#908C8C',
-          left: coords[2] + 1,
-          top: coords[3] - 5,
-          angle: 90,
-        }),
-        new fabric.IText(utterance, {
-          left: coords[0] - 10,
-          top: coords[3] - 5,
-          fontFamily: 'helvetica',
-          angle: 0,
-          fill: '#000000',
-          scaleX: 0.5,
-          scaleY: 0.5,
-          fontSize: 30,
-          hasRotatingPoint: true,
-        }),
-      ],*/
 
-    dashedArrow.id = identifier;
-    dashedArrow.type = EdgeTypeEnum.dashed_edge;
-    dashedArrow.hasBorders = false;
-    dashedArrow.hasControls = false;
-    dashedArrow.originElement = originElement;
-    dashedArrow.targetElement = targetElement;
-    dashedArrow.selectable = false;
-    dashedArrow.evented = false;
+    const triangle = new fabric.Triangle({
+      width: 15,
+      height: 20,
+      fill: '#908C8C',
+      left: dashedLine.getCenterPoint().x,
+      top: dashedLine.getCenterPoint().y,
+      angle: this.calcArrowAngle(coords[0], coords[1], coords[2], coords[3]),
+    });
 
-    originElement.lines.push(dashedArrow);
-    targetElement.lines.push(dashedArrow);
+    const utteranceText = new fabric.IText(utterance, {
+      left: dashedLine.getCenterPoint().x,
+      top: dashedLine.getCenterPoint().y - 20,
+      angle: 0,
+      fontFamily: 'helvetica',
+      fill: '#000000',
+      scaleX: 0.5,
+      scaleY: 0.5,
+      fontSize: 30,
+      hasRotatingPoint: true,
+    });
 
-    this.canvas.sendToBack(dashedArrow);
+    dashedLine.id = identifier;
+    dashedLine.type = EdgeTypeEnum.dashed_edge;
+    dashedLine.hasBorders = false;
+    dashedLine.hasControls = false;
+    dashedLine.originElement = originElement;
+    dashedLine.targetElement = targetElement;
+    dashedLine.selectable = false;
+    dashedLine.evented = false;
 
-    return dashedArrow;
-    // );
+    dashedLine.triangle = triangle;
+    dashedLine.utteranceText = utteranceText;
+
+    originElement.lines.push(dashedLine);
+    targetElement.lines.push(dashedLine);
+
+    return [dashedLine, triangle, utteranceText];
   }
 
   // Creates simple scene element.
@@ -678,14 +724,16 @@ export class DiagramPanelComponent implements OnInit {
     this.viewScreen = 'elementsPanel';
     this.transitionalPropertiesFormGroup.reset();
 
-    this.addElementToCanvas(
-      this.connectTwoElements(
-        this.getCurrentRenderingFigureId(),
-        source,
-        target,
-        utterance
-      )
+    const arrowContent: fabric.any[] = this.connectTwoElements(
+      this.getCurrentRenderingFigureId(),
+      source,
+      target,
+      utterance
     );
+
+    arrowContent.forEach((element) => {
+      this.addElementToCanvas(element);
+    });
   }
 
   // Renders non-edge and non-scene element and adds it to canvas.
