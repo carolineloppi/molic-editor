@@ -113,7 +113,10 @@ export class DiagramPanelComponent implements OnInit {
           }
 
           if (movingElement.oCoords.ml.x < anchoredElement.oCoords.ml.x) {
-            line.set({ x1: movingElement.left, y1: movingElement.top });
+            line.set({
+              x1: movingElement.left,
+              y1: movingElement.top,
+            });
             line.set({
               x2: anchoredElement.left,
               y2: anchoredElement.top,
@@ -147,6 +150,8 @@ export class DiagramPanelComponent implements OnInit {
           });
 
           this.canvas.sendToBack(line.line);
+
+          this.canvas.requestRenderAll();
         }
       });
 
@@ -322,7 +327,7 @@ export class DiagramPanelComponent implements OnInit {
           elementId,
           origin,
           target,
-          utterance
+          utterance ? utterance : ''
         );
       case EdgeTypeEnum.edge:
         return this.createArrowElement(elementId, origin, target, utterance);
@@ -359,8 +364,8 @@ export class DiagramPanelComponent implements OnInit {
     const coords = this.getArrowCoords(originElement, targetElement);
 
     const line = new fabric.Line(coords, {
-      stroke: '#908C8C',
-      strokeWidth: 1.5,
+      stroke: '#bab8b8',
+      strokeWidth: 1,
     });
 
     const triangle = new fabric.Triangle({
@@ -412,8 +417,8 @@ export class DiagramPanelComponent implements OnInit {
     const coords = this.getArrowCoords(originElement, targetElement);
 
     const dashedLine = new fabric.Line(coords, {
-      stroke: '#908C8C',
-      strokeWidth: 1.5,
+      stroke: '#bab8b8',
+      strokeWidth: 1,
       strokeDashArray: [3, 3],
     });
 
@@ -424,6 +429,7 @@ export class DiagramPanelComponent implements OnInit {
       left: dashedLine.getCenterPoint().x,
       top: dashedLine.getCenterPoint().y,
       angle: this.calcArrowAngle(coords[0], coords[1], coords[2], coords[3]),
+      selectable: false,
     });
 
     const utteranceText = new fabric.IText(utterance, {
@@ -462,66 +468,46 @@ export class DiagramPanelComponent implements OnInit {
     sceneName: string,
     dialogs: string
   ): fabric.Group {
-    // TODO: propagar para dashed-scene.
-    // TODO: quebrar linha ou ajustar para caber d+u e tooltip com hover
-    const sceneNameWidth = this.canvas
-      .getContext('2d')
-      .measureText(sceneName).width;
-
-    const sceneWidth = sceneNameWidth > 150 ? sceneNameWidth : 150;
-
     return new fabric.Group(
       [
         new fabric.Rect({
           radius: 2,
-          width: sceneWidth,
-          height: 100,
+          width: 200,
+          height: 140,
           left: 120,
           top: 60,
           angle: 0,
           fill: '#fff',
-          rx: 8,
-          ry: 8,
+          rx: 29,
+          ry: 29,
           stroke: '#908C8C',
           strokeWidth: 1.5,
           hasControls: false,
           hasBorders: false,
         }),
 
-        new fabric.IText(sceneName, {
-          left: 50,
-          top: 20,
-          fontFamily: 'helvetica',
-          angle: 0,
-          fill: '#000000',
-          scaleX: 0.5,
-          scaleY: 0.5,
-          fontSize: 30,
-          hasRotatingPoint: true,
-          originX: 'left',
-          originY: 'top',
+        new fabric.Textbox(sceneName, {
+          width: 150,
+          height: 100,
+          top: 15,
+          left: 110,
+          fontSize: 16,
+          textAlign: 'center',
         }),
 
-        new fabric.Line([0, 200, 148.5, 200], {
+        new fabric.Line([0, 200, 200, 200], {
           left: 120,
-          top: 40,
+          top: 35,
           stroke: '#908C8C',
         }),
-        // TODO: começar no espaço mais a esquerda e cortar em um limite de letras.
-        // colocar o diálogo e topics como hint.
-        // Colocar como hint o id de todos os elementos.
-        new fabric.IText(dialogs, {
-          left: 50,
-          top: 60,
-          fontFamily: 'helvetica',
-          angle: 0,
-          fill: '#000000',
-          scaleX: 0.5,
-          scaleY: 0.5,
-          fontSize: 30,
-          hasRotatingPoint: true,
-          originX: 'left',
-          originY: 'top',
+
+        new fabric.Textbox(dialogs, {
+          width: 200,
+          height: 200,
+          top: 80,
+          left: 120,
+          fontSize: 16,
+          textAlign: 'center',
         }),
       ],
       {
@@ -545,46 +531,44 @@ export class DiagramPanelComponent implements OnInit {
       [
         new fabric.Rect({
           radius: 2,
-          width: 100,
-          height: 70,
-          left: 10,
-          top: 10,
+          width: 200,
+          height: 140,
+          left: 120,
+          top: 60,
           angle: 0,
           fill: '#fff',
-          rx: 8,
-          ry: 8,
+          rx: 29,
+          ry: 29,
           stroke: '#908C8C',
+          strokeWidth: 1.5,
           strokeDashArray: [5, 5],
           hasControls: false,
           hasBorders: false,
         }),
-        new fabric.Line([50, 200, 148.5, 200], {
-          left: 11,
-          top: 3,
+
+        new fabric.Textbox(sceneName, {
+          width: 150,
+          height: 100,
+          top: 15,
+          left: 110,
+          fontSize: 16,
+          textAlign: 'center',
+        }),
+
+        new fabric.Line([0, 200, 200, 200], {
+          left: 120,
+          top: 35,
           stroke: '#908C8C',
           strokeDashArray: [5, 5],
         }),
-        new fabric.IText(sceneName, {
-          left: 38,
-          top: 14,
-          fontFamily: 'helvetica',
-          angle: 0,
-          fill: '#000000',
-          scaleX: 0.5,
-          scaleY: 0.5,
-          fontSize: 30,
-          hasRotatingPoint: true,
-        }),
-        new fabric.IText(dialogs, {
-          left: 38,
-          top: 4,
-          fontFamily: 'helvetica',
-          angle: 0,
-          fill: '#000000',
-          scaleX: 0.5,
-          scaleY: 0.5,
-          fontSize: 30,
-          hasRotatingPoint: true,
+
+        new fabric.Textbox(dialogs, {
+          width: 200,
+          height: 200,
+          top: 80,
+          left: 120,
+          fontSize: 16,
+          textAlign: 'center',
         }),
       ],
       {
