@@ -714,6 +714,15 @@ export class DiagramPanelComponent implements OnInit {
     const target = formData[targetKey];
     const utterance = formData[utteranceKey];
 
+    if (!source || !target) {
+      alert('Select both source and target nodes');
+      return;
+    }
+
+    if (source == target) {
+      alert('Source and target nodes should be different');
+      return;
+    }
     this.viewScreen = 'elementsPanel';
     this.transitionalPropertiesFormGroup.reset();
 
