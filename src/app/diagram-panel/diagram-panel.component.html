@@ -18,7 +18,7 @@
           <label class="inline-input-label" for="topic">Topic*:</label>
           <input class="inline-input" type="text" id="topic" formControlName="topic"><br><br>
           <label class="inline-input-label" for="dialogs">Dialog(s)*:</label>
-          <input class="long-input" type="text" id="dialogs" formControlName="dialogs"><br><br>
+          <input class="long-input" type="text" id="dialogs" placeholder="Enter the dialog(s) in a single line" formControlName="dialogs"><br><br>
           <div class="action-buttons">
             <button class="action-button-item" type="submit"><img class="submit-img" src="../assets/icons/ok.png"></button>
             <button class="action-button-item" type="button" (click)="cancelElementCreation('additionalProperties')"><img class="cancel-img" src="../assets/icons/cancel.png"></button>
@@ -41,7 +41,7 @@
           </select>
 
           <label class="inline-input-label" for="utterance">Utterance*:</label>
-          <input class="long-input" type="text" id="utterance" formControlName="utterance"><br><br>
+          <input class="long-input" type="text" id="utterance" placeholder="Enter the utterance in a single line" formControlName="utterance"><br><br>
           <div class="action-buttons">
             <button class="action-button-item" type="submit"><img class="submit-img" src="../assets/icons/ok.png"></button>
             <button class="action-button-item" type="button" (click)="cancelElementCreation('transitionalProperties')"><img class="cancel-img" src="../assets/icons/cancel.png"></button>
