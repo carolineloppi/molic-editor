@@ -282,15 +282,24 @@ export class DiagramPanelComponent implements OnInit {
 
   // Return elements that can be connected by edges.
   getConnectableElements(): any {
-    return this.canvas
+    const connectableTypes = [
+      SimpleNodeTypeEnum.dashed_scene,
+      SimpleNodeTypeEnum.scene,
+      SimpleNodeTypeEnum.start_node,
+      SimpleNodeTypeEnum.end_node,
+      SimpleNodeTypeEnum.system_process,
+      SimpleNodeTypeEnum.ubiquitous_acess,
+    ];
+    const elementsArray = this.canvas
       .getObjects()
-      .filter(
-        (el) =>
-          el.type !== EdgeTypeEnum.dashed_edge && el.type !== EdgeTypeEnum.edge
-      );
+      .filter((el) => connectableTypes.includes(el.type));
+
+    // TODO VERSION2: Since this array is currently with duplicates, it's being filtered for unique id values.
+    const filteredElementsArray = [...new Set(elementsArray)];
+
+    return filteredElementsArray;
   }
 
-  // TODO: filtrar a lista e descobrir motivo da duplicidade. Parece ser só com o Ubíquo e System.
   // Connects two node elements.
   connectTwoElements(
     elementId: string,
@@ -714,6 +723,10 @@ export class DiagramPanelComponent implements OnInit {
       target,
       utterance
     );
+
+    if (!arrowContent) {
+      return;
+    }
 
     arrowContent.forEach((element) => {
       this.addElementToCanvas(element);
