@@ -724,7 +724,7 @@ export class DiagramPanelComponent implements OnInit {
       return;
     }
 
-    if (source == target) {
+    if (source === target) {
       alert('Source and target nodes should be different');
       return;
     }
