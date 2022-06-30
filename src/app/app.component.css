@@ -35,6 +35,15 @@ header{
     font-weight: 600;
 }
 
+.action-button-disabled-label{
+  padding-left: 12px;
+  display: inline-flexbox;
+  font-size: 13px;
+  color: darkgray;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
 .header-title {
     margin-top: 20px;
     flex: 1;
@@ -67,8 +76,16 @@ header{
     cursor: pointer;
 }
 
+.action-button-disabled:hover{
+  cursor: not-allowed;
+
+}
+
 .screenshot-button{
     margin-right: 10px;
+}
+.screenshot-button:hover{
+  cursor: not-allowed;
 }
 
 .toolbar-button, .toolbar-img{
