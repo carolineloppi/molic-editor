@@ -1,4 +1,4 @@
-import { EdgeTypeEnum } from './edge-type';
+import { EdgeTypeEnum } from './enums/edge-type';
 
 export class Edge {
   id: number;

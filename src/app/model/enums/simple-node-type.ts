@@ -1,8 +1,8 @@
 export enum SimpleNodeTypeEnum {
   scene = 'Scene',
-  dashed_scene = 'Dashed Scene',
-  start_node = 'Start Node',
-  end_node = 'End Node',
+  alert_scene = 'Alert Scene',
+  conversation_opening = 'Conversation Opening',
+  conversation_closing = 'Conversation Closing',
   ubiquitous_acess = 'Ubiquitous Acess',
   system_process = 'System Process',
 }

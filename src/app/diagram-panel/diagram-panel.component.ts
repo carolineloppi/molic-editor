@@ -1,7 +1,7 @@
-import { EdgeTypeEnum } from './../model/edge-type';
+import { EdgeTypeEnum } from '../model/enums/edge-type';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { SimpleNodeTypeEnum } from './../model/simple-node-type';
+import { SimpleNodeTypeEnum } from '../model/enums/simple-node-type';
 
 import { fabric } from 'fabric';
 
@@ -58,12 +58,12 @@ export class DiagramPanelComponent implements OnInit {
     // TODO VERSION2: update inicial Ids when loading XML project file.
     this.elementsIdMap.set(SimpleNodeTypeEnum.ubiquitous_acess, 0);
     this.elementsIdMap.set(SimpleNodeTypeEnum.system_process, 0);
-    this.elementsIdMap.set(SimpleNodeTypeEnum.start_node, 0);
-    this.elementsIdMap.set(SimpleNodeTypeEnum.end_node, 0);
-    this.elementsIdMap.set(EdgeTypeEnum.edge, 0);
-    this.elementsIdMap.set(EdgeTypeEnum.dashed_edge, 0);
+    this.elementsIdMap.set(SimpleNodeTypeEnum.conversation_opening, 0);
+    this.elementsIdMap.set(SimpleNodeTypeEnum.conversation_closing, 0);
+    this.elementsIdMap.set(EdgeTypeEnum.turn_giving, 0);
+    this.elementsIdMap.set(EdgeTypeEnum.breakdown_recovery_turn_giving, 0);
     this.elementsIdMap.set(SimpleNodeTypeEnum.scene, 0);
-    this.elementsIdMap.set(SimpleNodeTypeEnum.dashed_scene, 0);
+    this.elementsIdMap.set(SimpleNodeTypeEnum.alert_scene, 0);
   }
 
   ngOnInit(): void {
@@ -205,18 +205,18 @@ export class DiagramPanelComponent implements OnInit {
     this.currentRenderingFigure = figure;
 
     switch (figure) {
-      case EdgeTypeEnum.edge:
+      case EdgeTypeEnum.turn_giving:
         this.viewScreen = 'transitionPropertiesPanel';
-        this.currentArrowType = EdgeTypeEnum.edge;
+        this.currentArrowType = EdgeTypeEnum.turn_giving;
         break;
-      case EdgeTypeEnum.dashed_edge:
+      case EdgeTypeEnum.breakdown_recovery_turn_giving:
         this.viewScreen = 'transitionPropertiesPanel';
-        this.currentArrowType = EdgeTypeEnum.dashed_edge;
+        this.currentArrowType = EdgeTypeEnum.breakdown_recovery_turn_giving;
 
         break;
 
       case SimpleNodeTypeEnum.scene:
-      case SimpleNodeTypeEnum.dashed_scene:
+      case SimpleNodeTypeEnum.alert_scene:
         this.viewScreen = 'additionalPropertiesPanel';
         break;
 
@@ -241,8 +241,8 @@ export class DiagramPanelComponent implements OnInit {
           topic ? topic : '',
           description ? description : ''
         );
-      case SimpleNodeTypeEnum.dashed_scene:
-        return this.createDashedSceneElement(
+      case SimpleNodeTypeEnum.alert_scene:
+        return this.createAlertSceneElement(
           elementId,
           topic ? topic : '',
           description ? description : ''
@@ -254,22 +254,22 @@ export class DiagramPanelComponent implements OnInit {
             this.elementsIdMap.get(SimpleNodeTypeEnum.ubiquitous_acess)
         );
       case SimpleNodeTypeEnum.system_process:
-        return this.createProcessingBoxElement(
+        return this.createSystemProcessElement(
           SimpleNodeTypeEnum.system_process +
             ' - ' +
             this.elementsIdMap.get(SimpleNodeTypeEnum.system_process)
         );
-      case SimpleNodeTypeEnum.start_node:
-        return this.createStartPointElement(
-          SimpleNodeTypeEnum.start_node +
+      case SimpleNodeTypeEnum.conversation_opening:
+        return this.createConversationOpeningElement(
+          SimpleNodeTypeEnum.conversation_opening +
             ' - ' +
-            this.elementsIdMap.get(SimpleNodeTypeEnum.start_node)
+            this.elementsIdMap.get(SimpleNodeTypeEnum.conversation_opening)
         );
-      case SimpleNodeTypeEnum.end_node:
-        return this.createEndPointElement(
-          SimpleNodeTypeEnum.end_node +
+      case SimpleNodeTypeEnum.conversation_closing:
+        return this.createConversationClosingElement(
+          SimpleNodeTypeEnum.conversation_closing +
             ' - ' +
-            this.elementsIdMap.get(SimpleNodeTypeEnum.end_node)
+            this.elementsIdMap.get(SimpleNodeTypeEnum.conversation_closing)
         );
     }
   }
@@ -283,10 +283,10 @@ export class DiagramPanelComponent implements OnInit {
   // Return elements that can be connected by edges.
   getConnectableElements(): any {
     const connectableTypes = [
-      SimpleNodeTypeEnum.dashed_scene,
+      SimpleNodeTypeEnum.alert_scene,
       SimpleNodeTypeEnum.scene,
-      SimpleNodeTypeEnum.start_node,
-      SimpleNodeTypeEnum.end_node,
+      SimpleNodeTypeEnum.conversation_opening,
+      SimpleNodeTypeEnum.conversation_closing,
       SimpleNodeTypeEnum.system_process,
       SimpleNodeTypeEnum.ubiquitous_acess,
     ];
@@ -331,15 +331,20 @@ export class DiagramPanelComponent implements OnInit {
     }
 
     switch (this.currentRenderingFigure) {
-      case EdgeTypeEnum.dashed_edge:
-        return this.createDashedArrowElement(
+      case EdgeTypeEnum.breakdown_recovery_turn_giving:
+        return this.createBreakdownRecoveryElement(
           elementId,
           origin,
           target,
           utterance ? utterance : ''
         );
-      case EdgeTypeEnum.edge:
-        return this.createArrowElement(elementId, origin, target, utterance);
+      case EdgeTypeEnum.turn_giving:
+        return this.createTurnGivingElement(
+          elementId,
+          origin,
+          target,
+          utterance
+        );
     }
   }
 
@@ -363,8 +368,8 @@ export class DiagramPanelComponent implements OnInit {
     return [arrowStartX, arrowStartY, arrowEndX, arrowEndY];
   }
 
-  // Creates simple edge element.
-  createArrowElement(
+  // Creates Turn Giving element.
+  createTurnGivingElement(
     identifier: string,
     originElement,
     targetElement,
@@ -399,7 +404,7 @@ export class DiagramPanelComponent implements OnInit {
     });
 
     line.id = identifier;
-    line.type = EdgeTypeEnum.edge;
+    line.type = EdgeTypeEnum.turn_giving;
     line.hasBorders = false;
     line.hasControls = false;
     line.originElement = originElement;
@@ -416,8 +421,8 @@ export class DiagramPanelComponent implements OnInit {
     return [line, triangle, utteranceText];
   }
 
-  // Creates dashed edge element.
-  createDashedArrowElement(
+  // Creates Breakdown Recovery Turn Giving element.
+  createBreakdownRecoveryElement(
     identifier: string,
     originElement,
     targetElement,
@@ -454,7 +459,7 @@ export class DiagramPanelComponent implements OnInit {
     });
 
     dashedLine.id = identifier;
-    dashedLine.type = EdgeTypeEnum.dashed_edge;
+    dashedLine.type = EdgeTypeEnum.breakdown_recovery_turn_giving;
     dashedLine.hasBorders = false;
     dashedLine.hasControls = false;
     dashedLine.originElement = originElement;
@@ -471,7 +476,7 @@ export class DiagramPanelComponent implements OnInit {
     return [dashedLine, triangle, utteranceText];
   }
 
-  // Creates simple scene element.
+  // Creates Scene element.
   createSceneElement(
     identifier: string,
     sceneName: string,
@@ -530,8 +535,8 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  // Creates dashed scene element.
-  createDashedSceneElement(
+  // Creates Alert Scene element.
+  createAlertSceneElement(
     identifier: string,
     sceneName: string,
     dialogs: string
@@ -581,8 +586,8 @@ export class DiagramPanelComponent implements OnInit {
         }),
       ],
       {
-        id: SimpleNodeTypeEnum.dashed_scene + ' - ' + identifier,
-        type: SimpleNodeTypeEnum.dashed_scene,
+        id: SimpleNodeTypeEnum.alert_scene + ' - ' + identifier,
+        type: SimpleNodeTypeEnum.alert_scene,
         viewName: sceneName,
         hasBorders: false,
         hasControls: false,
@@ -591,8 +596,8 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  // Creates end point element.
-  createEndPointElement(identifier: string): fabric.Group {
+  // Creates Conversation Closing element.
+  createConversationClosingElement(identifier: string): fabric.Group {
     return new fabric.Group(
       [
         new fabric.Circle({
@@ -612,7 +617,7 @@ export class DiagramPanelComponent implements OnInit {
       ],
       {
         id: identifier,
-        type: SimpleNodeTypeEnum.end_node,
+        type: SimpleNodeTypeEnum.conversation_closing,
         hasBorders: false,
         hasControls: false,
         lines: [],
@@ -620,11 +625,11 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  // Creates start point element.
-  createStartPointElement(identifier: string): fabric.Circle {
+  // Creates Conversation Opening element.
+  createConversationOpeningElement(identifier: string): fabric.Circle {
     return new fabric.Circle({
       id: identifier,
-      type: SimpleNodeTypeEnum.start_node,
+      type: SimpleNodeTypeEnum.conversation_opening,
       radius: 15,
       left: 120,
       top: 60,
@@ -635,8 +640,8 @@ export class DiagramPanelComponent implements OnInit {
     });
   }
 
-  // Creates system process element.
-  createProcessingBoxElement(identifier: string): fabric.Rect {
+  // Creates System Process element.
+  createSystemProcessElement(identifier: string): fabric.Rect {
     const systemProcess = new fabric.Rect({
       id: identifier,
       type: SimpleNodeTypeEnum.system_process,
@@ -655,7 +660,7 @@ export class DiagramPanelComponent implements OnInit {
     return systemProcess;
   }
 
-  // Creates ubiquitous element.
+  // Creates Ubiquitous element.
   createUbiquitousElement(identifier: string): fabric.Rect {
     const ubiquitous = new fabric.Rect({
       id: identifier,
@@ -687,7 +692,7 @@ export class DiagramPanelComponent implements OnInit {
     }
   }
 
-  // Renders scene type elements and adds it to canvas.
+  // Renders Scene type elements and adds it to canvas.
   createSceneWithAdditionalProperties(formData): void {
     const topicKey = 'topic';
     const dialogsKey = 'dialogs';
@@ -704,7 +709,7 @@ export class DiagramPanelComponent implements OnInit {
     );
   }
 
-  // Renders edge type elements and adds it to canvas.
+  // Renders Turn Giving type elements and adds it to canvas.
   createTransitionalElement(formData): void {
     const sourceKey = 'source';
     const targetKey = 'target';
@@ -742,7 +747,7 @@ export class DiagramPanelComponent implements OnInit {
     });
   }
 
-  // Renders non-edge and non-scene element and adds it to canvas.
+  // Renders non-Turn Giving and non-Scene element and adds it to canvas.
   createSimpleElement(): void {
     this.addElementToCanvas(
       this.renderElement(this.getCurrentRenderingFigureId())
