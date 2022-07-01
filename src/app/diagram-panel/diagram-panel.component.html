@@ -14,7 +14,7 @@
     </div>
     <div *ngIf="viewScreen == 'additionalPropertiesPanel'" class="additional-properties-panel">
       <div class="properties-title"> Additional Properties </div>
-      <form [formGroup]="additionalPropertiesFormGroup" (ngSubmit)="createSceneWithAdditionalProperties(additionalPropertiesFormGroup.value)">
+      <form [formGroup]="additionalPropertiesFormGroup" (ngSubmit)="askForScenesAdditionalProperties(additionalPropertiesFormGroup.value)">
           <label class="inline-input-label" for="topic">Topic*:</label>
           <input class="inline-input" type="text" id="topic" formControlName="topic"><br><br>
           <label class="inline-input-label" for="dialogs">Dialog(s)*:</label>
@@ -29,7 +29,7 @@
 
     <div *ngIf="viewScreen == 'transitionPropertiesPanel'" class="additional-properties-panel">
       <div class="properties-title"> Transition Properties </div>
-      <form [formGroup]="transitionalPropertiesFormGroup" (ngSubmit)="createTransitionalElement(transitionalPropertiesFormGroup.value)">
+      <form [formGroup]="transitionalPropertiesFormGroup" (ngSubmit)="askForTransitionalProperties(transitionalPropertiesFormGroup.value)">
           <label class="inline-input-label" for="source">Source Element*:</label>
           <select class="inline-input" id="source" formControlName="source">
             <option *ngFor="let item of this.getConnectableElements()" [value]="item.id">{{item.viewName ? item.viewName : item.id}}</option>
