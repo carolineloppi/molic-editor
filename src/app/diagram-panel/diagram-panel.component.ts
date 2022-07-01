@@ -2,7 +2,7 @@ import { ConnectElementsService } from './../services/connect-elements.service';
 import { RenderNodeElementsService } from './../services/render-node-elements.service';
 import { GenericCanvasService } from './../services/generic-canvas.service';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { EdgeTypeEnum } from '../model/enums/edge-type';
 import { SimpleNodeTypeEnum } from '../model/enums/simple-node-type';
 
@@ -14,9 +14,10 @@ import { fabric } from 'fabric';
   styleUrls: ['./diagram-panel.component.css'],
 })
 
-// TODO: permitir deleção de item
+// TODO_VERSION2: permitir deleção de item
 export class DiagramPanelComponent implements OnInit {
-  private canvas: any;
+  // Canvas object
+  canvas: any;
 
   // Panel currently visible.
   // Values are: elementsPanel, transitionPropertiesPanel and additionalPropertiesPanel
@@ -71,11 +72,11 @@ export class DiagramPanelComponent implements OnInit {
     fabric.Object.prototype.originX = fabric.Object.prototype.originY =
       'center';
 
-    // Reposition element and connection when moving
-    this.canvas.on('mouse:move', (e) => {
-      this.canvasService.updateConnectionPosition(this.canvas, e);
-      this.canvas.renderAll();
-    });
+    this.setMouseWatchers();
+  }
+
+  setMouseWatchers(): void {
+    this.canvasService.setDefaultMouseMoveBehaviour(this.canvas);
   }
 
   // Sets initial id for each element type.
@@ -130,22 +131,7 @@ export class DiagramPanelComponent implements OnInit {
 
   // Return elements that can be connected by edges.
   getConnectableElements(): any {
-    const connectableTypes = [
-      SimpleNodeTypeEnum.alert_scene,
-      SimpleNodeTypeEnum.scene,
-      SimpleNodeTypeEnum.conversation_opening,
-      SimpleNodeTypeEnum.conversation_closing,
-      SimpleNodeTypeEnum.system_process,
-      SimpleNodeTypeEnum.ubiquitous_acess,
-    ];
-    const elementsArray = this.canvas
-      .getObjects()
-      .filter((el) => connectableTypes.includes(el.type));
-
-    // TODO VERSION2: Since this array is currently with duplicates, it's being filtered for unique id values.
-    const filteredElementsArray = [...new Set(elementsArray)];
-
-    return filteredElementsArray;
+    return this.canvasService.getConnectableElementsOnly(this.canvas);
   }
 
   // Returns current id for the current rendering figure type.
@@ -155,19 +141,22 @@ export class DiagramPanelComponent implements OnInit {
     return elementId.toString();
   }
 
+  // Reset form values
+  clearForm(formGroup: FormGroup): void {
+    formGroup.reset();
+  }
   // Cancel the elements creation and removes it from Canvas.
   cancelElementCreation(elementType: string): void {
     switch (elementType) {
       case 'additionalProperties':
-        this.additionalPropertiesFormGroup.reset();
-        this.canvasService.removeElementFromCanvas(
-          this.canvas,
-          this.canvas.getActiveObject()
-        );
+        this.clearForm(this.additionalPropertiesFormGroup);
+
+        this.canvasService.removeActiveElementFromCanvas(this.canvas);
         break;
 
       case 'transitionalProperties':
-        this.transitionalPropertiesFormGroup.reset();
+        this.clearForm(this.transitionalPropertiesFormGroup);
+
         const arrowUnderConstruction = this.canvas
           .getObjects()
           .filter(
@@ -198,7 +187,7 @@ export class DiagramPanelComponent implements OnInit {
       this.currentRenderingFigure
     );
     this.viewScreen = 'elementsPanel';
-    this.transitionalPropertiesFormGroup.reset();
+    this.clearForm(this.transitionalPropertiesFormGroup);
   }
 
   // Creates Scene Element with form data.
@@ -211,6 +200,6 @@ export class DiagramPanelComponent implements OnInit {
       this.elementsIdMap
     );
     this.viewScreen = 'elementsPanel';
-    this.additionalPropertiesFormGroup.reset();
+    this.clearForm(this.additionalPropertiesFormGroup);
   }
 }

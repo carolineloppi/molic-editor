@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { fabric } from 'fabric';
+import { SimpleNodeTypeEnum } from '../model/enums/simple-node-type';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,15 @@ export class GenericCanvasService {
     width: window.innerWidth,
     height: 1000,
   };
+
+  private connectableTypes = [
+    SimpleNodeTypeEnum.alert_scene,
+    SimpleNodeTypeEnum.scene,
+    SimpleNodeTypeEnum.conversation_opening,
+    SimpleNodeTypeEnum.conversation_closing,
+    SimpleNodeTypeEnum.system_process,
+    SimpleNodeTypeEnum.ubiquitous_acess,
+  ];
 
   constructor() {}
 
@@ -38,6 +48,11 @@ export class GenericCanvasService {
     canvas.remove(elementToRemove);
   }
 
+  // Remove a specific element from canvas.
+  removeActiveElementFromCanvas(canvas: any): void {
+    canvas.remove(canvas.getActiveObject());
+  }
+
   // Selects the object on Canvas.
   selectCanvasObject(canvas: any, obj): void {
     canvas.discardActiveObject().renderAll();
@@ -49,6 +64,29 @@ export class GenericCanvasService {
     if (canvas) {
       canvas.clear();
     }
+  }
+
+  // Return all objects drawn on canvas.
+  getCanvasObjects(canvas: any): any[] {
+    return canvas.getObjects();
+  }
+
+  getConnectableElementsOnly(canvas: any): any[] {
+    const canvasObjects: any[] = this.getCanvasObjects(canvas);
+    const elementsArray = Array.isArray(canvasObjects)
+      ? canvasObjects.filter((el) => this.connectableTypes.includes(el.type))
+      : [];
+
+    // TODO VERSION2: Since this array is currently with duplicates, it's being filtered for unique id values.
+    return [...new Set(elementsArray)];
+  }
+
+  setDefaultMouseMoveBehaviour(canvas): void {
+    // Reposition element and connection when moving
+    canvas.on('mouse:move', (e) => {
+      this.updateConnectionPosition(canvas, e);
+      canvas.renderAll();
+    });
   }
   /*
   This calcArrowAngle function below (with a few adjusts) was provided in a StackOverflow answer and used here.

@@ -1,3 +1,6 @@
+import { ConnectElementsService } from './services/connect-elements.service';
+import { RenderNodeElementsService } from './services/render-node-elements.service';
+import { GenericCanvasService } from './services/generic-canvas.service';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -7,6 +10,12 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DiagramPanelComponent } from './diagram-panel/diagram-panel.component';
+
+const canvasService: GenericCanvasService = new GenericCanvasService();
+const renderNodeElementsService: RenderNodeElementsService =
+  new RenderNodeElementsService(canvasService);
+const connectElementsService: ConnectElementsService =
+  new ConnectElementsService(canvasService);
 
 @NgModule({
   declarations: [AppComponent, DiagramPanelComponent],
@@ -18,7 +27,20 @@ import { DiagramPanelComponent } from './diagram-panel/diagram-panel.component';
     TooltipModule.forRoot(),
     ModalModule.forRoot(),
   ],
-  providers: [],
+  providers: [
+    {
+      provide: GenericCanvasService,
+      useValue: canvasService,
+    },
+    {
+      provide: RenderNodeElementsService,
+      useValue: renderNodeElementsService,
+    },
+    {
+      provide: ConnectElementsService,
+      useValue: connectElementsService,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
