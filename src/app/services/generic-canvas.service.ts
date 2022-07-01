@@ -1,10 +1,29 @@
 import { Injectable } from '@angular/core';
+import { fabric } from 'fabric';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GenericCanvasService {
+  // Canvas default size.
+  private size: any = {
+    width: window.innerWidth,
+    height: 1000,
+  };
+
   constructor() {}
+
+  setupNewCanvas(): any {
+    const canvas = new fabric.Canvas('canvas', {
+      hoverCursor: 'pointer',
+      selection: true,
+      selectionBorderColor: 'blue',
+    });
+    canvas.setWidth(this.size.width);
+    canvas.setHeight(this.size.height);
+
+    return canvas;
+  }
 
   // Adds an element to canvas and select it.
   addElementToCanvas(canvas: any, newElement: any): void {

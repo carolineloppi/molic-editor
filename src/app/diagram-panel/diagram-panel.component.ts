@@ -33,12 +33,6 @@ export class DiagramPanelComponent implements OnInit {
 
   currentArrowType: any;
 
-  // Canvas default size.
-  private size: any = {
-    width: window.innerWidth,
-    height: 1000,
-  };
-
   // Enables enum acess to HTMl.
   SimpleNodeType = SimpleNodeTypeEnum;
   EdgeType = EdgeTypeEnum;
@@ -68,13 +62,7 @@ export class DiagramPanelComponent implements OnInit {
 
   ngOnInit(): void {
     // Canvas setup
-    this.canvas = new fabric.Canvas('canvas', {
-      hoverCursor: 'pointer',
-      selection: true,
-      selectionBorderColor: 'blue',
-    });
-    this.canvas.setWidth(this.size.width);
-    this.canvas.setHeight(this.size.height);
+    this.canvas = this.canvasService.setupNewCanvas();
 
     // Default view screen to panel with elements
     this.viewScreen = 'elementsPanel';
