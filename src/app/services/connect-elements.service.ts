@@ -98,7 +98,7 @@ export class ConnectElementsService {
           elementId,
           origin,
           target,
-          utterance
+          utterance ? utterance : ''
         );
     }
   }
