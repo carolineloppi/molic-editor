@@ -43,6 +43,11 @@ export class GenericCanvasService {
     }
   }
 
+  // Return element with elementId on canvas.
+  getCanvasElementById(canvas: any, elementId: string): any {
+    return canvas.getObjects().filter((el) => el.id === elementId)[0];
+  }
+
   // Remove a specific element from canvas.
   removeElementFromCanvas(canvas: any, elementToRemove: any): void {
     canvas.remove(elementToRemove);

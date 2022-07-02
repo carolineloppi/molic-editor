@@ -13,6 +13,7 @@ describe('GenericCanvasService', () => {
     left: 10,
     top: 10,
     fontFamily: 'helvetica',
+    id: 1,
   });
 
   beforeEach(() => {
@@ -43,6 +44,19 @@ describe('GenericCanvasService', () => {
 
     expect(canvas.getObjects().length).toBe(1);
     expect(canvas.getObjects()[0].text).toBe('Text element');
+  });
+
+  it('should get canvas element by id', () => {
+    // Canvas is empty
+    expect(canvas.getObjects().length).toBe(0);
+
+    canvasService.addElementToCanvas(canvas, textElement);
+    const foundElement = canvasService.getCanvasElementById(
+      canvas,
+      textElement.id
+    );
+
+    expect(foundElement).toBe(textElement);
   });
 
   it('should remove element from canvas', () => {

@@ -8,7 +8,24 @@ import { EdgeTypeEnum } from '../model/enums/edge-type';
   providedIn: 'root',
 })
 export class ConnectElementsService {
+  sourceKey = 'source';
+  targetKey = 'target';
+  utteranceKey = 'utterance';
+
+  formData;
+
   constructor(private canvasService: GenericCanvasService) {}
+
+  getSource(): any {
+    return this.formData[this.sourceKey];
+  }
+  getTarget(): any {
+    return this.formData[this.targetKey];
+  }
+
+  getUtterance(): any {
+    return this.formData[this.utteranceKey];
+  }
 
   // Renders Turn Giving type elements and adds it to canvas.
   createTransitionalElement(
@@ -17,25 +34,22 @@ export class ConnectElementsService {
     currentRenderingFigureId,
     currentRenderingFigure
   ): void {
-    const sourceKey = 'source';
-    const targetKey = 'target';
-    const utteranceKey = 'utterance';
-
-    const source = formData[sourceKey];
-    const target = formData[targetKey];
-    const utterance = formData[utteranceKey];
+    this.formData = formData;
+    const source = this.getSource();
+    const target = this.getTarget();
+    const utterance = this.getUtterance();
 
     if (!source || !target) {
-      alert('Select both source and target nodes');
+      this.showErrorMessage('Select both source and target nodes');
       return;
     }
 
     if (source === target) {
-      alert('Source and target nodes should be different');
+      this.showErrorMessage('Source and target nodes should be different');
       return;
     }
 
-    const arrowContent: fabric.any[] = this.connectTwoElements(
+    const connection = this.connectTwoElements(
       canvas,
       currentRenderingFigureId,
       currentRenderingFigure,
@@ -44,13 +58,50 @@ export class ConnectElementsService {
       utterance
     );
 
-    if (!arrowContent) {
+    if (!connection) {
       return;
     }
 
-    arrowContent.forEach((element) => {
+    connection.forEach((element) => {
       this.canvasService.addElementToCanvas(canvas, element);
     });
+  }
+
+  // Check if canvas has at least two elements to be connected
+  validateCanvasContent(canvas): boolean {
+    if (this.canvasService.getCanvasObjects(canvas).length < 2) {
+      this.showErrorMessage(
+        'There are not enough elements to create a connection'
+      );
+      return false;
+    }
+    return true;
+  }
+
+  validateOriginElement(canvas, originElementId): any {
+    const origin = this.canvasService.getCanvasElementById(
+      canvas,
+      originElementId
+    );
+
+    if (!origin) {
+      this.showErrorMessage('Origin element is not available to connect with');
+      return undefined;
+    }
+    return origin;
+  }
+
+  validateTargetElement(canvas, targetElementId): any {
+    const target = this.canvasService.getCanvasElementById(
+      canvas,
+      targetElementId
+    );
+
+    if (!target) {
+      this.showErrorMessage('Target element is not available to connect with');
+      return undefined;
+    }
+    return target;
   }
 
   // Connects two node elements.
@@ -62,26 +113,14 @@ export class ConnectElementsService {
     targetElementId: string,
     utterance: string
   ): fabric.any[] {
-    if (canvas.getObjects().length < 2) {
-      console.log('There are not enough elements to create a connection');
+    if (!this.validateCanvasContent(canvas)) {
       return;
     }
+    const originElement = this.validateOriginElement(canvas, originElementId);
 
-    const origin: fabric.Group = canvas
-      .getObjects()
-      .filter((el) => el.id === originElementId)[0];
+    const targetElement = this.validateTargetElement(canvas, targetElementId);
 
-    const target: fabric.Group = canvas
-      .getObjects()
-      .filter((el) => el.id === targetElementId)[0];
-
-    if (!origin) {
-      console.log('Origin element is not available to connect with');
-      return;
-    }
-
-    if (!target) {
-      console.log('Target element is not available to connect with');
+    if (!originElement || !targetElement) {
       return;
     }
 
@@ -89,18 +128,22 @@ export class ConnectElementsService {
       case EdgeTypeEnum.breakdown_recovery_turn_giving:
         return this.createBreakdownRecoveryElement(
           elementId,
-          origin,
-          target,
+          originElement,
+          targetElement,
           utterance ? utterance : ''
         );
       case EdgeTypeEnum.turn_giving:
         return this.createTurnGivingElement(
           elementId,
-          origin,
-          target,
+          originElement,
+          targetElement,
           utterance ? utterance : ''
         );
     }
+  }
+
+  showErrorMessage(errorMessage: string): void {
+    alert(errorMessage);
   }
 
   // Creates Turn Giving element.
