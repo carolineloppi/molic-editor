@@ -13,7 +13,7 @@ https://github.com/carolineloppi/molic-editor/blob/main/documentation/Main%20Pro
 
 ## Functionalities
 
-:speech_balloon: Create a MoLIC Diagram from scratch;
+:white_check_mark: Create a MoLIC Diagram from scratch;
 
 :speech_balloon: Edit existing MoLIC Diagram;
 
