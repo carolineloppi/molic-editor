@@ -1,17 +1,14 @@
-# MoLIC_Builder Project :octocat:
+# MoLIC_Editor Project :octocat:
 
-> Project Status: starting
-> Access Current Version On: https://molic-editor.herokuapp.com/
+> First Version Available: https://molic-editor.herokuapp.com/
 
 ## Project Documentation
 
-#### :page_facing_up: Main Program Architecture
-#### :page_facing_up: Main Program Specification
+https://github.com/carolineloppi/molic-editor/blob/main/documentation/Main%20Program%20Specification%20-%20MoLIC_Editor_V2.pdf
 
-Link: https://github.com/carolineloppi/molic-editor/tree/main/documentation
 ## Project Description
 
-> Project under construction for my PFP @PUC-RIO master's program :bulb:
+> Project under construction for my @PUC-RIO master's program :bulb:
 > This system is intended to be an editor and creator of MoLIC's diagrams.
 
 ## Functionalities
@@ -25,14 +22,15 @@ Link: https://github.com/carolineloppi/molic-editor/tree/main/documentation
 :speech_balloon: Save a screenshot of the current MoLIC Diagram;
 
 ## Prerequisites
-> You should have the following installed in your machine:
- - Angular (version: 10.1.1)
- - Node (version: v10.18.0)
 
+> You should have the following installed in your machine:
+
+- Angular (version: 10.1.1)
+- Node (version: v10.18.0)
 
 ## How To Run the Project
 
- - Clone this repo;
- - Change to project directory
-  - Run npm i
- - Run ng serve -o
+- Clone this repo;
+- Change to project directory
+- Run npm i
+- Run ng serve -o
